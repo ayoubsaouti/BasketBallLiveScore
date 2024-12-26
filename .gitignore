@@ -1,0 +1,61 @@
+# Exclure les fichiers temporaires de Visual Studio
+.vs/
+*.vscode
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Dossiers de sortie des builds
+bin/
+obj/
+
+# Fichiers de logs
+*.log
+*.tlog
+
+# Exclure les fichiers de sécurité
+*.pfx
+*.snk
+
+# Configuration spécifique à l'environnement
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.Production.json
+
+# Exclure les fichiers de dépendances Node.js (Angular)
+node_modules/
+dist/
+tmp/
+
+# Cache des frameworks front-end
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs de l'application
+logs/
+*.log
+*.nlog
+*.out
+*.csv
+
+# Rapport de test
+TestResult*/
+*.trx
+*.coverage
+
+# Configuration des IDE
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Exclure les fichiers de backup éventuels
+*.bak
+*.tmp
+*.old
+*.backup
+
+# Exclure les fichiers de docker s'ils existent
+docker-compose.override.yml

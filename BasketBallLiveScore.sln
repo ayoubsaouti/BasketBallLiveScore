@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketBallLiveScore.Server", "BasketBallLiveScore.Server\BasketBallLiveScore.Server.csproj", "{82748692-5F26-408A-8042-B73C0410CD07}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "basketballlivescore.client", "basketballlivescore.client\basketballlivescore.client.esproj", "{4FFC0F02-5A76-4A7A-AD66-1B93D49192BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{82748692-5F26-408A-8042-B73C0410CD07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82748692-5F26-408A-8042-B73C0410CD07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82748692-5F26-408A-8042-B73C0410CD07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82748692-5F26-408A-8042-B73C0410CD07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FFC0F02-5A76-4A7A-AD66-1B93D49192BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FFC0F02-5A76-4A7A-AD66-1B93D49192BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FFC0F02-5A76-4A7A-AD66-1B93D49192BE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{4FFC0F02-5A76-4A7A-AD66-1B93D49192BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FFC0F02-5A76-4A7A-AD66-1B93D49192BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FFC0F02-5A76-4A7A-AD66-1B93D49192BE}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E9C4EFF-5ECC-423B-B5D8-9846AF541632}
+	EndGlobalSection
+EndGlobal
