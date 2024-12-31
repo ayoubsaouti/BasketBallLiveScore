@@ -1,1 +1,29 @@
-/* You can add global styles to this file, and also import other style files */
+/* src/styles.css */
+
+/* Style global du body */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  margin: 0;
+  padding: 0;
+}
+
+/* Style des boutons */
+button {
+  transition: all 0.3s ease-in-out;
+}
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+/* Style des liens */
+a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+  a:hover {
+    text-decoration: underline;
+  }

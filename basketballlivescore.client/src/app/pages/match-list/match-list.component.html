@@ -1,0 +1,12 @@
+<div *ngIf="loading">Chargement des matchs...</div>
+
+<div *ngIf="!loading">
+  <h1>Liste des matchs</h1>
+  <ul>
+    <li *ngFor="let match of matches">
+      {{ match.matchNumber }} - {{ match.competition }} - {{ match.matchDate | date:'short' }}
+    </li>
+  </ul>
+
+  <button (click)="addNewMatch()">Ajouter un match</button>
+</div>

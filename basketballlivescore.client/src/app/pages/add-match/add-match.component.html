@@ -1,0 +1,42 @@
+<!-- src/app/pages/add-match/add-match.component.html -->
+<div>
+  <h1>Ajouter un match</h1>
+  <form (ngSubmit)="createMatch()">
+    <label>Numéro du match:</label>
+    <input type="text" [(ngModel)]="matchData.matchNumber" name="matchNumber" required>
+
+    <label>Compétition:</label>
+    <input type="text" [(ngModel)]="matchData.competition" name="competition" required>
+
+    <label>Date et heure du match:</label>
+    <input type="datetime-local" [(ngModel)]="matchData.matchDate" name="matchDate" required>
+
+    <h3>Équipe à domicile</h3>
+    <label>Nom complet:</label>
+    <input type="text" [(ngModel)]="teamsData.homeTeamName" name="homeTeamName" required>
+
+    <label>Nom court:</label>
+    <input type="text" [(ngModel)]="teamsData.homeShortName" name="homeShortName" required>
+
+    <label>Code court:</label>
+    <input type="text" [(ngModel)]="teamsData.homeTeamCode" name="homeTeamCode" required>
+
+    <label>Couleur:</label>
+    <input type="text" [(ngModel)]="teamsData.homeTeamColor" name="homeTeamColor" required>
+
+    <h3>Équipe visiteuse</h3>
+    <label>Nom complet:</label>
+    <input type="text" [(ngModel)]="teamsData.awayTeamName" name="awayTeamName" required>
+
+    <label>Nom court:</label>
+    <input type="text" [(ngModel)]="teamsData.awayShortName" name="awayShortName" required>
+
+    <label>Code court:</label>
+    <input type="text" [(ngModel)]="teamsData.awayTeamCode" name="awayTeamCode" required>
+
+    <label>Couleur:</label>
+    <input type="text" [(ngModel)]="teamsData.awayTeamColor" name="awayTeamColor" required>
+
+    <button type="submit">Créer le match</button>
+  </form>
+</div>

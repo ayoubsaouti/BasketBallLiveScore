@@ -1,0 +1,34 @@
+<!-- src/app/pages/login/login.component.html -->
+<div class="container">
+  <h2>Connexion</h2>
+
+  <form (ngSubmit)="login()">
+    <div>
+      <label for="email">Email :</label>
+      <input type="email"
+             id="email"
+             [(ngModel)]="email"
+             name="email"
+             required />
+    </div>
+
+    <div>
+      <label for="password">Mot de passe :</label>
+      <input type="password"
+             id="password"
+             [(ngModel)]="password"
+             name="password"
+             required />
+    </div>
+
+    <div *ngIf="errorMessage" class="error">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <button type="submit">Se connecter</button>
+  </form>
+
+  <div class="signup-link">
+    <p>Vous n'avez pas de compte ? <a routerLink="/register">Créer un compte</a></p>
+  </div>
+</div>

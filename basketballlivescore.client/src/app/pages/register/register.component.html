@@ -1,0 +1,43 @@
+<!-- src/app/pages/register/register.component.html -->
+<div class="container">
+  <h2>Créer un compte</h2>
+
+  <form (ngSubmit)="register()">
+    <div>
+      <label for="email">Email :</label>
+      <input type="email"
+             id="email"
+             [(ngModel)]="email"
+             name="email"
+             required />
+    </div>
+
+    <div>
+      <label for="password">Mot de passe :</label>
+      <input type="password"
+             id="password"
+             [(ngModel)]="password"
+             name="password"
+             required />
+    </div>
+
+    <div>
+      <label for="confirmPassword">Confirmer le mot de passe :</label>
+      <input type="password"
+             id="confirmPassword"
+             [(ngModel)]="confirmPassword"
+             name="confirmPassword"
+             required />
+    </div>
+
+    <div *ngIf="errorMessage" class="error">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <button type="submit">S'inscrire</button>
+  </form>
+
+  <div class="login-link">
+    <p>Déjà un compte ? <a routerLink="/login">Se connecter</a></p>
+  </div>
+</div>

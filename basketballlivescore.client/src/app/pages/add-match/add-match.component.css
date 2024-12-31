@@ -1,0 +1,65 @@
+/* src/app/pages/add-match/add-match.component.css */
+
+/* Style pour le formulaire d'ajout de match */
+h1 {
+  text-align: center;
+  color: #2C3E50;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+/* Conteneur principal du formulaire */
+form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Champs de saisie */
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #34495e;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+/* Bouton de soumission */
+button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+  button:hover {
+    background-color: #2980b9;
+  }
+
+/* Style pour le titre des équipes */
+h3 {
+  margin-top: 20px;
+  color: #34495e;
+  font-size: 1.5rem;
+  text-align: center;
+}
