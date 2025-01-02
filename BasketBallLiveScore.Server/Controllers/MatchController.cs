@@ -5,6 +5,7 @@ using BasketBallLiveScore.Server.Models;
 using BasketBallLiveScore.Server.DTO;
 using BasketBallLiveScore.Server.Services;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BasketBallLiveScore.Server.Controllers
 {
@@ -32,6 +33,8 @@ namespace BasketBallLiveScore.Server.Controllers
                 return BadRequest("Les données du match sont invalides.");
             }
 
+            
+
             // Créer le match avec les informations de base (sans les équipes)
             var match = _matchService.CreateMatch(
                 config.MatchNumber,
@@ -40,6 +43,7 @@ namespace BasketBallLiveScore.Server.Controllers
                 config.Periods,
                 config.PeriodDuration,
                 config.OvertimeDuration,
+                "Test", // Enregistre l'email de l'utilisateur qui crée le match
                 null, // Pas d'équipes associées pour l'instant
                 null  // Pas d'équipes associées pour l'instant
             );
@@ -135,11 +139,44 @@ namespace BasketBallLiveScore.Server.Controllers
         [HttpGet("getMatches")]
         public async Task<ActionResult> GetMatches()
         {
-            // Récupérer tous les matchs avec leurs équipes associées
             var matches = await _context.Matches
-                .Include(m => m.Team1)
-                .Include(m => m.Team2)
-                .ToListAsync();
+                    .Include(m => m.Team1)
+                    .ThenInclude(t => t.Players)
+                    .Include(m => m.Team2)
+                    .ThenInclude(t => t.Players)
+                    .Select(m => new MatchDTO
+                    {
+                        MatchId = m.MatchId,
+                        MatchNumber = m.MatchNumber,
+                        Competition = m.Competition,
+                        MatchDate = m.MatchDate,
+                        Periods = m.Periods,
+                        PeriodDuration = m.PeriodDuration,
+                        OvertimeDuration = m.OvertimeDuration,
+                        HomeTeamName = m.Team1.TeamName,
+                        AwayTeamName = m.Team2.TeamName,
+                        HomePlayers = m.Team1.Players.Select(p => new PlayerDTO
+                        {
+                            PlayerId = p.PlayerId,
+                            Number = p.Number,
+                            FirstName = p.FirstName,
+                            LastName = p.LastName,
+                            Position = p.Position,
+                            IsCaptain = p.IsCaptain,
+                            IsInGame = p.IsInGame
+                        }).ToList(),
+                        AwayPlayers = m.Team2.Players.Select(p => new PlayerDTO
+                        {
+                            PlayerId = p.PlayerId,
+                            Number = p.Number,
+                            FirstName = p.FirstName,
+                            LastName = p.LastName,
+                            Position = p.Position,
+                            IsCaptain = p.IsCaptain,
+                            IsInGame = p.IsInGame
+                        }).ToList()
+                    })
+                    .ToListAsync();
 
             if (matches == null || matches.Count == 0)
             {
@@ -149,6 +186,177 @@ namespace BasketBallLiveScore.Server.Controllers
             return Ok(matches);
         }
 
+
+        [HttpGet("getMatch/{matchId}")]
+        public async Task<ActionResult> GetMatchById(int matchId)
+        {
+            var match = await _context.Matches
+                .Include(m => m.Team1)  // Inclure les informations de l'équipe 1
+                .ThenInclude(t => t.Players)  // Inclure les joueurs de l'équipe 1
+                .Include(m => m.Team2)  // Inclure les informations de l'équipe 2
+                .ThenInclude(t => t.Players)  // Inclure les joueurs de l'équipe 2
+                .FirstOrDefaultAsync(m => m.MatchId == matchId);  // Récupérer le match par son ID
+
+            if (match == null)
+            {
+                return NotFound("Match non trouvé.");
+            }
+
+            // Mapper les données du match dans un DTO (Data Transfer Object)
+            var matchDTO = new MatchDTO
+            {
+                MatchId = match.MatchId,
+                MatchNumber = match.MatchNumber,
+                Competition = match.Competition,
+                MatchDate = match.MatchDate,
+                Periods = match.Periods,
+                PeriodDuration = match.PeriodDuration,
+                OvertimeDuration = match.OvertimeDuration,
+                HomeTeamName = match.Team1.TeamName,
+                AwayTeamName = match.Team2.TeamName,
+                HomePlayers = match.Team1.Players.Select(p => new PlayerDTO
+                {
+                    PlayerId = p.PlayerId,
+                    Number = p.Number,
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    Position = p.Position,
+                    IsCaptain = p.IsCaptain,
+                    IsInGame = p.IsInGame
+                }).ToList(),
+                AwayPlayers = match.Team2.Players.Select(p => new PlayerDTO
+                {
+                    PlayerId = p.PlayerId,
+                    Number = p.Number,
+                    FirstName = p.FirstName,
+                    LastName = p.LastName,
+                    Position = p.Position,
+                    IsCaptain = p.IsCaptain,
+                    IsInGame = p.IsInGame
+                }).ToList()
+            };
+
+            return Ok(matchDTO);  // Retourner les détails du match
+        }
+
+        // Endpoint pour enregistrer un panier marqué
+        [HttpPost("{id}/score")]
+        public async Task<ActionResult> RecordScore(int id, [FromBody] ScoreDto scoreDto)
+        {
+            var match = await _context.Matches.Include(m => m.HomeTeam).Include(m => m.AwayTeam).FirstOrDefaultAsync(m => m.MatchId == id);
+
+            if (match == null)
+            {
+                return NotFound();
+            }
+
+            // Ajouter le score (logique métier)
+            var score = new Score
+            {
+                PlayerId = scoreDto.PlayerId,
+                Points = scoreDto.Points,
+                Time = DateTime.Now
+            };
+
+            match.Scores.Add(score);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Panier marqué avec succès" });
+        }
+
+        // Endpoint pour enregistrer une faute
+        [HttpPost("{id}/foul")]
+        public async Task<ActionResult> RecordFoul(int id, [FromBody] FoulDto foulDto)
+        {
+            var match = await _context.Matches
+                .Include(m => m.HomeTeam)
+                .Include(m => m.AwayTeam)
+                .FirstOrDefaultAsync(m => m.MatchId == id);
+
+            if (match == null)
+            {
+                return NotFound();
+            }
+
+            var foul = new Foul
+            {
+                PlayerId = foulDto.PlayerId,
+                FoulType = foulDto.FoulType,
+                Time = DateTime.Now,
+                Quarter = foulDto.Quarter
+            };
+
+            match.Fouls.Add(foul);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Faute enregistrée avec succès" });
+        }
+
+        [HttpPost("{id}/substitution")]
+        public async Task<ActionResult> RecordSubstitution(int id, [FromBody] SubstitutionDto substitutionDto)
+        {
+            var match = await _context.Matches
+                .Include(m => m.HomeTeam)
+                .Include(m => m.AwayTeam)
+                .FirstOrDefaultAsync(m => m.MatchId == id);
+
+            if (match == null)
+            {
+                return NotFound();
+            }
+
+            // Vérifier si les joueurs existent dans le match
+            var subInPlayer = await _context.Players.FindAsync(substitutionDto.SubInPlayerId);
+            var subOutPlayer = await _context.Players.FindAsync(substitutionDto.SubOutPlayerId);
+
+            if (subInPlayer == null || subOutPlayer == null)
+            {
+                return BadRequest("Joueur entrant ou sortant invalide.");
+            }
+
+            // Créer une entrée de substitution
+            var substitution = new Substitution
+            {
+                SubInPlayerId = substitutionDto.SubInPlayerId,
+                SubOutPlayerId = substitutionDto.SubOutPlayerId,
+                Time = DateTime.Now,  // Le moment exact de la substitution
+                Quarter = substitutionDto.Quarter
+            };
+
+            // Ajouter la substitution à l'historique
+            _context.Substitutions.Add(substitution);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Changement de joueur enregistré avec succès" });
+        }
+
+
+        [HttpPost("{id}/timeout")]
+        public async Task<ActionResult> RecordTimeout(int id, [FromBody] TimeoutDto timeoutDto)
+        {
+            var match = await _context.Matches
+                .Include(m => m.HomeTeam)
+                .Include(m => m.AwayTeam)
+                .FirstOrDefaultAsync(m => m.MatchId == id);
+
+            if (match == null)
+            {
+                return NotFound();
+            }
+
+            // Enregistrer le time-out de l'équipe
+            var timeout = new Timeout
+            {
+                Team = timeoutDto.Team,  // 'home' ou 'away'
+                Quarter = timeoutDto.Quarter,
+                Time = DateTime.Now  // Le moment exact du time-out
+            };
+
+            _context.Timeouts.Add(timeout);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Time-out enregistré avec succès" });
+        }
 
 
     }

@@ -4,6 +4,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { MatchListComponent } from './pages/match-list/match-list.component';
 import { AddMatchComponent } from './pages/add-match/add-match.component';
+import { EncodingFactsComponent } from './pages/encoding-facts/encoding-facts.component';  // Assurez-vous d'importer le composant
 
 
 const routes: Routes = [
@@ -12,6 +13,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'home', component: MatchListComponent },
   { path: 'add-match', component: AddMatchComponent },
+  { path: 'encoding-facts/:id', component: EncodingFactsComponent },  // Paramètre matchId
 
 
 ];

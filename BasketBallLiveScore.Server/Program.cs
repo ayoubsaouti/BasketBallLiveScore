@@ -1,16 +1,34 @@
-using Microsoft.EntityFrameworkCore;
 using BasketBallLiveScore.Server.Data;
 using BasketBallLiveScore.Server.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ajoute le service AuthService
+// Ajouter l'authentification avec JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+        };
+    });
+
+// Services
 builder.Services.AddScoped<AuthService>();
-
-// Ajoute le service TeamService
 builder.Services.AddScoped<TeamService>();
-
-// Ajoute le service MatchService
 builder.Services.AddScoped<MatchService>();
 
 // Configuration CORS
@@ -18,9 +36,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()  // Permet les requêtes de n'importe quelle origine
-              .AllowAnyMethod()  // Permet toutes les méthodes HTTP (GET, POST, etc.)
-              .AllowAnyHeader(); // Permet tous les en-têtes
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
@@ -28,14 +46,51 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// Ajoute la configuration des contrôleurs
-builder.Services.AddControllersWithViews();
+// Ajouter Swagger et la configuration JWT pour Swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Basketball Live Score API",
+        Version = "v1"
+    });
 
-// Services supplémentaires
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Veuillez entrer le token JWT",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        BearerFormat = "JWT",
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+// Configuration des contrôleurs
+builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+// Ajout de l'authentification au pipeline
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configuration du pipeline de requêtes
 if (app.Environment.IsDevelopment())
@@ -44,16 +99,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Utilise la politique CORS "AllowAll"
+// Utiliser la politique CORS "AllowAll"
 app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
 
 // Mappe les contrôleurs
-app.MapControllers(); // Point d'entrée pour l'API
-
-// Fallback pour une application SPA (comme Angular ou React)
-app.MapFallbackToFile("/index.html");
+app.MapControllers();
 
 app.Run();

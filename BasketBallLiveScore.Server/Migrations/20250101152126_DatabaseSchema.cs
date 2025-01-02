@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BasketBallLiveScore.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class DatabaseSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,10 @@ namespace BasketBallLiveScore.Server.Migrations
                 {
                     TeamId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TeamName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TeamCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShortName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TeamColor = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,9 +33,8 @@ namespace BasketBallLiveScore.Server.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,9 +47,14 @@ namespace BasketBallLiveScore.Server.Migrations
                 {
                     MatchId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Team1Id = table.Column<int>(type: "int", nullable: false),
-                    Team2Id = table.Column<int>(type: "int", nullable: false),
-                    MatchDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    MatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Competition = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MatchDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Periods = table.Column<int>(type: "int", nullable: false),
+                    PeriodDuration = table.Column<int>(type: "int", nullable: false),
+                    OvertimeDuration = table.Column<int>(type: "int", nullable: false),
+                    Team1Id = table.Column<int>(type: "int", nullable: true),
+                    Team2Id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -72,7 +79,12 @@ namespace BasketBallLiveScore.Server.Migrations
                 {
                     PlayerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsCaptain = table.Column<bool>(type: "bit", nullable: false),
+                    IsInGame = table.Column<bool>(type: "bit", nullable: false),
                     TeamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -94,8 +106,7 @@ namespace BasketBallLiveScore.Server.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MatchId = table.Column<int>(type: "int", nullable: false),
                     QuarterNumber = table.Column<int>(type: "int", nullable: false),
-                    ScoreTeam1 = table.Column<int>(type: "int", nullable: false),
-                    ScoreTeam2 = table.Column<int>(type: "int", nullable: false)
+                    QuarterDuration = table.Column<TimeSpan>(type: "time", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -107,91 +118,6 @@ namespace BasketBallLiveScore.Server.Migrations
                         principalColumn: "MatchId",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "Changes",
-                columns: table => new
-                {
-                    ChangeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PlayerInId = table.Column<int>(type: "int", nullable: false),
-                    PlayerOutId = table.Column<int>(type: "int", nullable: false),
-                    QuarterId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Changes", x => x.ChangeId);
-                    table.ForeignKey(
-                        name: "FK_Changes_Players_PlayerInId",
-                        column: x => x.PlayerInId,
-                        principalTable: "Players",
-                        principalColumn: "PlayerId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Changes_Players_PlayerOutId",
-                        column: x => x.PlayerOutId,
-                        principalTable: "Players",
-                        principalColumn: "PlayerId",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Changes_Quarters_QuarterId",
-                        column: x => x.QuarterId,
-                        principalTable: "Quarters",
-                        principalColumn: "QuarterId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Fouls",
-                columns: table => new
-                {
-                    FoulId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PlayerId = table.Column<int>(type: "int", nullable: false),
-                    QuarterId = table.Column<int>(type: "int", nullable: false),
-                    FoulType = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Fouls", x => x.FoulId);
-                    table.ForeignKey(
-                        name: "FK_Fouls_Players_PlayerId",
-                        column: x => x.PlayerId,
-                        principalTable: "Players",
-                        principalColumn: "PlayerId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Fouls_Quarters_QuarterId",
-                        column: x => x.QuarterId,
-                        principalTable: "Quarters",
-                        principalColumn: "QuarterId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Changes_PlayerInId",
-                table: "Changes",
-                column: "PlayerInId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Changes_PlayerOutId",
-                table: "Changes",
-                column: "PlayerOutId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Changes_QuarterId",
-                table: "Changes",
-                column: "QuarterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Fouls_PlayerId",
-                table: "Fouls",
-                column: "PlayerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Fouls_QuarterId",
-                table: "Fouls",
-                column: "QuarterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Matches_Team1Id",
@@ -218,19 +144,13 @@ namespace BasketBallLiveScore.Server.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Changes");
-
-            migrationBuilder.DropTable(
-                name: "Fouls");
-
-            migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "Players");
 
             migrationBuilder.DropTable(
                 name: "Quarters");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Matches");

@@ -1,0 +1,140 @@
+/* Style global */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
+h1, h2, h3 {
+  text-align: center;
+}
+
+.match-facts-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.chrono-container {
+  text-align: center;
+}
+
+.time-display {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.start-stop-button {
+  background-color: #007BFF;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+  .start-stop-button:hover {
+    background-color: #0056b3;
+  }
+
+.teams-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.team-container {
+  width: 45%;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.team-info {
+  margin-top: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.actions-container {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.scoring-container,
+.foul-container {
+  width: 48%;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+  .scoring-container h3, .foul-container h3 {
+    margin-bottom: 20px;
+  }
+
+label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background-color: #28a745;
+  color: white;
+  font-size: 18px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+  button:hover {
+    background-color: #218838;
+  }
+
+/* Responsiveness pour les petits écrans */
+@media (max-width: 768px) {
+  .teams-container {
+    flex-direction: column;
+  }
+
+  .team-container {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .actions-container {
+    flex-direction: column;
+  }
+
+  .scoring-container,
+  .foul-container {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .start-stop-button {
+    width: 100%;
+  }
+}

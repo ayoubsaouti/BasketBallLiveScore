@@ -11,6 +11,7 @@ import { AddMatchComponent } from './pages/add-match/add-match.component';  // I
 
 import { MatchService } from './services/match.service';
 import { FormsModule } from '@angular/forms';
+import { EncodingFactsComponent } from './pages/encoding-facts/encoding-facts.component';
 
 
 
@@ -20,7 +21,8 @@ import { FormsModule } from '@angular/forms';
     LoginComponent,
     RegisterComponent,
     MatchListComponent,
-    AddMatchComponent
+    AddMatchComponent,
+    EncodingFactsComponent
   ],
   imports: [
     BrowserModule,

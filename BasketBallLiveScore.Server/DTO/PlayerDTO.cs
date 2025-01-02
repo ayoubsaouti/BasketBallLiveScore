@@ -2,6 +2,8 @@
 {
     public class PlayerDTO
     {
+        public int PlayerId { get; set; }
+
         public int Number { get; set; }          // Numéro du joueur
         public string FirstName { get; set; }    // Prénom du joueur
         public string LastName { get; set; }     // Nom du joueur

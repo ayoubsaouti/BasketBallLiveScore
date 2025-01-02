@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BasketBallLiveScore.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241230143304_UpdateDatabase")]
-    partial class UpdateDatabase
+    [Migration("20250101152126_DatabaseSchema")]
+    partial class DatabaseSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,10 +53,10 @@ namespace BasketBallLiveScore.Server.Migrations
                     b.Property<int>("Periods")
                         .HasColumnType("int");
 
-                    b.Property<int>("Team1Id")
+                    b.Property<int?>("Team1Id")
                         .HasColumnType("int");
 
-                    b.Property<int>("Team2Id")
+                    b.Property<int?>("Team2Id")
                         .HasColumnType("int");
 
                     b.HasKey("MatchId");
@@ -118,13 +118,10 @@ namespace BasketBallLiveScore.Server.Migrations
                     b.Property<int>("MatchId")
                         .HasColumnType("int");
 
+                    b.Property<TimeSpan>("QuarterDuration")
+                        .HasColumnType("time");
+
                     b.Property<int>("QuarterNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ScoreTeam1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ScoreTeam2")
                         .HasColumnType("int");
 
                     b.HasKey("QuarterId");
@@ -132,40 +129,6 @@ namespace BasketBallLiveScore.Server.Migrations
                     b.HasIndex("MatchId");
 
                     b.ToTable("Quarters");
-                });
-
-            modelBuilder.Entity("BasketBallLiveScore.Server.Models.Staff", b =>
-                {
-                    b.Property<int>("StaffId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffId"));
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
-
-                    b.HasKey("StaffId");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("Staff");
                 });
 
             modelBuilder.Entity("BasketBallLiveScore.Server.Models.Team", b =>
@@ -223,14 +186,12 @@ namespace BasketBallLiveScore.Server.Migrations
                     b.HasOne("BasketBallLiveScore.Server.Models.Team", "Team1")
                         .WithMany()
                         .HasForeignKey("Team1Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("BasketBallLiveScore.Server.Models.Team", "Team2")
                         .WithMany()
                         .HasForeignKey("Team2Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Team1");
 
@@ -251,7 +212,7 @@ namespace BasketBallLiveScore.Server.Migrations
             modelBuilder.Entity("BasketBallLiveScore.Server.Models.Quarter", b =>
                 {
                     b.HasOne("BasketBallLiveScore.Server.Models.Match", "Match")
-                        .WithMany("Quarters")
+                        .WithMany()
                         .HasForeignKey("MatchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -259,27 +220,9 @@ namespace BasketBallLiveScore.Server.Migrations
                     b.Navigation("Match");
                 });
 
-            modelBuilder.Entity("BasketBallLiveScore.Server.Models.Staff", b =>
-                {
-                    b.HasOne("BasketBallLiveScore.Server.Models.Team", "Team")
-                        .WithMany("Staff")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("BasketBallLiveScore.Server.Models.Match", b =>
-                {
-                    b.Navigation("Quarters");
-                });
-
             modelBuilder.Entity("BasketBallLiveScore.Server.Models.Team", b =>
                 {
                     b.Navigation("Players");
-
-                    b.Navigation("Staff");
                 });
 #pragma warning restore 612, 618
         }

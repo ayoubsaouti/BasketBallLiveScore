@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace BasketBallLiveScore.Server.Models
 {
     public class Team

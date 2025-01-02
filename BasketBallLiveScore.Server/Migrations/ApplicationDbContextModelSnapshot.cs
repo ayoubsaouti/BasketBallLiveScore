@@ -34,6 +34,10 @@ namespace BasketBallLiveScore.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Encoder")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("MatchDate")
                         .HasColumnType("datetime2");
 

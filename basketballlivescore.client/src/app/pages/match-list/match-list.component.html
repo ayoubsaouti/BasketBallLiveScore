@@ -1,12 +1,47 @@
 <div *ngIf="loading">Chargement des matchs...</div>
 
-<div *ngIf="!loading">
+<div *ngIf="!loading" class="match-list-container">
   <h1>Liste des matchs</h1>
-  <ul>
-    <li *ngFor="let match of matches">
-      {{ match.matchNumber }} - {{ match.competition }} - {{ match.matchDate | date:'short' }}
-    </li>
-  </ul>
 
-  <button (click)="addNewMatch()">Ajouter un match</button>
+  <!-- Affichage des matchs sous forme de cartes -->
+  <div class="match-card" *ngFor="let match of matches">
+    <div class="match-header">
+      <h2>{{ match.matchNumber }} - {{ match.competition }}</h2>
+      <div class="match-date">{{ match.matchDate | date:'short' }}</div>
+    </div>
+
+    <div class="match-info">
+      <div><span class="variable">Équipes :</span> <span class="value">{{ match.homeTeamName }} vs {{ match.awayTeamName }}</span></div>
+      <div><span class="variable">Quart-temps :</span> <span class="value">{{ match.periods }} ({{ match.periodDuration }} min)</span></div>
+      <div><span class="variable">Timeout :</span> <span class="value">{{ match.overtimeDuration }} min</span></div>
+      <div><span class="variable">Encodé par :</span> <span class="value">{{ match.encoder }}</span></div>
+      <div><span class="variable">Enregistrement des faits :</span> <span class="value">{{ match.matchRecorder }}</span></div>
+    </div>
+
+    <div class="players-list">
+      <div class="team-left">
+        <div class="team-title">Joueurs {{ match.homeTeamName }} :</div>
+        <ul>
+          <li *ngFor="let player of match.homePlayers">{{ player.number }} : {{ player.firstName }} {{ player.lastName }}</li>
+        </ul>
+      </div>
+
+      <div class="team-right">
+        <div class="team-title">Joueurs {{ match.awayTeamName }} :</div>
+        <ul>
+          <li *ngFor="let player of match.awayPlayers">{{ player.number }} : {{ player.firstName }} {{ player.lastName }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bouton pour l'encodage en temps réel des faits de match -->
+    <div class="real-time-encoding-container">
+      <button class="real-time-encoding-button" (click)="encodingFacts(match.matchId)">
+        Encodage des faits de match
+      </button>
+    </div>
+  </div>
+
+  <!-- Bouton d'ajout de match -->
+  <button class="add-match-button" (click)="addNewMatch()">Ajouter un match</button>
 </div>

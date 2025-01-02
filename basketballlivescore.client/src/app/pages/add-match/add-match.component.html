@@ -1,6 +1,5 @@
-<!-- src/app/pages/add-match/add-match.component.html -->
-<div>
-  <h1>Ajouter un match</h1>
+<div *ngIf="currentStep === 1">
+  <h1>Étape 1: Créer un match</h1>
   <form (ngSubmit)="createMatch()">
     <label>Numéro du match:</label>
     <input type="text" [(ngModel)]="matchData.matchNumber" name="matchNumber" required>
@@ -11,32 +10,125 @@
     <label>Date et heure du match:</label>
     <input type="datetime-local" [(ngModel)]="matchData.matchDate" name="matchDate" required>
 
-    <h3>Équipe à domicile</h3>
-    <label>Nom complet:</label>
-    <input type="text" [(ngModel)]="teamsData.homeTeamName" name="homeTeamName" required>
+    <label>Nombre de périodes:</label>
+    <input type="number" [(ngModel)]="matchData.periods" name="periods" required>
 
-    <label>Nom court:</label>
-    <input type="text" [(ngModel)]="teamsData.homeShortName" name="homeShortName" required>
+    <label>Durée de chaque période (min):</label>
+    <input type="number" [(ngModel)]="matchData.periodDuration" name="periodDuration" required>
 
-    <label>Code court:</label>
-    <input type="text" [(ngModel)]="teamsData.homeTeamCode" name="homeTeamCode" required>
-
-    <label>Couleur:</label>
-    <input type="text" [(ngModel)]="teamsData.homeTeamColor" name="homeTeamColor" required>
-
-    <h3>Équipe visiteuse</h3>
-    <label>Nom complet:</label>
-    <input type="text" [(ngModel)]="teamsData.awayTeamName" name="awayTeamName" required>
-
-    <label>Nom court:</label>
-    <input type="text" [(ngModel)]="teamsData.awayShortName" name="awayShortName" required>
-
-    <label>Code court:</label>
-    <input type="text" [(ngModel)]="teamsData.awayTeamCode" name="awayTeamCode" required>
-
-    <label>Couleur:</label>
-    <input type="text" [(ngModel)]="teamsData.awayTeamColor" name="awayTeamColor" required>
+    <label>Durée du prolongement (min):</label>
+    <input type="number" [(ngModel)]="matchData.overtimeDuration" name="overtimeDuration" required>
 
     <button type="submit">Créer le match</button>
   </form>
+</div>
+
+<div *ngIf="currentStep === 2">
+  <h1>Étape 2: Ajouter les équipes</h1>
+  <form (ngSubmit)="addTeamsToMatch()">
+    <label>Nom complet de l'équipe à domicile:</label>
+    <input type="text" [(ngModel)]="teamsData.homeTeamName" name="homeTeamName" required>
+
+    <label>Nom court de l'équipe à domicile:</label>
+    <input type="text" [(ngModel)]="teamsData.homeShortName" name="homeShortName" required>
+
+    <label>Code de l'équipe à domicile:</label>
+    <input type="text" [(ngModel)]="teamsData.homeTeamCode" name="homeTeamCode" required>
+
+    <label>Couleur de l'équipe à domicile:</label>
+    <input type="text" [(ngModel)]="teamsData.homeTeamColor" name="homeTeamColor" required>
+
+    <label>Nom complet de l'équipe visiteuse:</label>
+    <input type="text" [(ngModel)]="teamsData.awayTeamName" name="awayTeamName" required>
+
+    <label>Nom court de l'équipe visiteuse:</label>
+    <input type="text" [(ngModel)]="teamsData.awayShortName" name="awayShortName" required>
+
+    <label>Code de l'équipe visiteuse:</label>
+    <input type="text" [(ngModel)]="teamsData.awayTeamCode" name="awayTeamCode" required>
+
+    <label>Couleur de l'équipe visiteuse:</label>
+    <input type="text" [(ngModel)]="teamsData.awayTeamColor" name="awayTeamColor" required>
+
+    <button type="submit">Ajouter les équipes</button>
+  </form>
+</div>
+
+<div *ngIf="currentStep === 3">
+  <h1>Étape 3: Ajouter les joueurs</h1>
+  <div class="players-container">
+    <!-- Colonne pour l'équipe à domicile -->
+    <div class="team-column">
+      <h3>Joueurs à domicile</h3>
+      <form>
+        <label>Prénom :</label>
+        <input type="text" [(ngModel)]="homePlayerForm.firstName" name="homeFirstName" required>
+
+        <label>Nom :</label>
+        <input type="text" [(ngModel)]="homePlayerForm.lastName" name="homeLastName" required>
+
+        <label>Numéro :</label>
+        <input type="number" [(ngModel)]="homePlayerForm.number" name="homeNumber" required>
+
+        <label>Position :</label>
+        <input type="text" [(ngModel)]="homePlayerForm.position" name="homePosition">
+
+        <label>Capitaine :</label>
+        <input type="checkbox" [(ngModel)]="homePlayerForm.isCaptain" name="homeIsCaptain">
+
+        <label>Dans le jeu :</label>
+        <input type="checkbox" [(ngModel)]="homePlayerForm.isInGame" name="homeIsInGame">
+      </form>
+
+      <button type="button" (click)="addHomePlayer()">Ajouter un joueur à domicile</button>
+
+      <div class="current-team">
+        <h4>Équipe actuelle :</h4>
+        <ul>
+          <li *ngFor="let player of playersData.homePlayers">
+            {{player.number}} : {{player.firstName}} {{player.lastName}}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Colonne pour l'équipe visiteuse -->
+    <div class="team-column">
+      <h3>Joueurs visiteurs</h3>
+      <form>
+        <label>Prénom :</label>
+        <input type="text" [(ngModel)]="awayPlayerForm.firstName" name="awayFirstName" required>
+
+        <label>Nom :</label>
+        <input type="text" [(ngModel)]="awayPlayerForm.lastName" name="awayLastName" required>
+
+        <label>Numéro :</label>
+        <input type="number" [(ngModel)]="awayPlayerForm.number" name="awayNumber" required>
+
+        <label>Position :</label>
+        <input type="text" [(ngModel)]="awayPlayerForm.position" name="awayPosition">
+
+        <label>Capitaine :</label>
+        <input type="checkbox" [(ngModel)]="awayPlayerForm.isCaptain" name="awayIsCaptain">
+
+        <label>Dans le jeu :</label>
+        <input type="checkbox" [(ngModel)]="awayPlayerForm.isInGame" name="awayIsInGame">
+      </form>
+
+      <button type="button" (click)="addAwayPlayer()">Ajouter un joueur visiteur</button>
+
+      <div class="current-team">
+        <h4>Équipe actuelle :</h4>
+        <ul>
+          <li *ngFor="let player of playersData.awayPlayers">
+            {{player.number}} : {{player.firstName}} {{player.lastName}}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="finalize-container">
+    <button class="finalize-button" (click)="addPlayersToMatch()">Finaliser l'ajout des joueurs</button>
+  </div>
 </div>

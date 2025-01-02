@@ -1,56 +1,165 @@
-/* src/app/pages/match-list/match-list.component.css */
+/* Style général de la page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+}
 
-/* Style pour la liste des matchs */
+/* Conteneur principal */
+.match-list-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+/* Style pour les titres */
 h1 {
   text-align: center;
-  color: #2C3E50;
   font-size: 2rem;
-  margin-top: 20px;
+  color: #34495e;
+  margin-bottom: 20px;
 }
 
-/* Liste des matchs */
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+/* Cartes pour afficher les matchs */
+.match-card {
+  background-color: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-li {
-  background-color: #f8f9fa;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  font-size: 1.1rem;
+/* Tête de la carte du match */
+.match-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
-/* Style du bouton pour ajouter un match */
-button {
-  display: block;
-  width: 200px;
-  margin: 20px auto;
+  .match-header h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+.match-date {
+  font-size: 1rem;
+  color: #95a5a6;
+}
+
+/* Informations du match */
+.match-info {
+  font-size: 1rem;
+  color: #34495e;
+}
+
+  .match-info div {
+    margin-bottom: 10px;
+  }
+
+    /* Variables et valeurs */
+    .match-info div span.variable {
+      font-weight: bold;
+      color: #3498db;
+    }
+
+    .match-info div span.value {
+      color: #2c3e50;
+    }
+
+/* Affichage des joueurs */
+.players-list {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+  .players-list div {
+    width: 45%;
+    margin-bottom: 8px;
+  }
+
+  .players-list span {
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .players-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin-left: 20px;
+  }
+
+  .players-list li {
+    font-size: 1rem;
+    color: #34495e;
+  }
+
+  .players-list .team-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+
+  /* Joueurs de l'équipe à domicile */
+  .players-list .team-left {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  /* Joueurs de l'équipe visiteuse */
+  .players-list .team-right {
+    background-color: #ecf0f1;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+/* Bouton pour ajouter un match */
+.add-match-button {
+  position: fixed;
+  top: 30px;
+  right: 30px;
   padding: 12px 20px;
   background-color: #3498db;
   color: white;
   border: none;
   border-radius: 5px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-  button:hover {
+  .add-match-button:hover {
     background-color: #2980b9;
   }
 
-/* Style pour l'indicateur de chargement */
-.loading {
-  text-align: center;
-  font-size: 1.5rem;
-  color: #95a5a6;
+/* Séparateurs */
+hr {
+  border: 1px solid #ecf0f1;
+  margin: 20px 0;
 }
+
+/* Bouton pour l'encodage en temps réel des faits de match */
+.real-time-encoding-container {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.real-time-encoding-button {
+  padding: 12px 20px;
+  background-color: #34495e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+  .real-time-encoding-button:hover {
+    background-color: #5D6D7E;
+  }

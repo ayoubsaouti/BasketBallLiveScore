@@ -1,0 +1,83 @@
+<div class="match-facts-container">
+  <!-- Chrono en haut de l'écran -->
+  <div class="chrono-container">
+    <h1>Encodage des Faits de Match</h1>
+    <div class="time-display">
+      <span>{{ time | number: '2.0' }}</span>
+    </div>
+    <button class="start-stop-button" (click)="startStopTimer()">
+      {{ timerRunning ? 'Arrêter Chrono' : 'Démarrer Chrono' }}
+    </button>
+  </div>
+
+  <!-- Section centrale pour l'enregistrement des faits -->
+  <div class="teams-container">
+    <!-- Informations sur l'équipe A (à gauche) -->
+    <div class="team-container team-left">
+      <h2>{{ match?.homeTeamName }}</h2>
+      <div class="team-info">
+        <p>Score: {{ match?.homeScore }}</p>
+        <p>Joueurs:</p>
+        <ul>
+          <li *ngFor="let player of match?.homePlayers">{{ player.name }} ({{ player.number }})</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Informations sur l'équipe B (à droite) -->
+    <div class="team-container team-right">
+      <h2>{{ match?.awayTeamName }}</h2>
+      <div class="team-info">
+        <p>Score: {{ match?.awayScore }}</p>
+        <p>Joueurs:</p>
+        <ul>
+          <li *ngFor="let player of match?.awayPlayers">{{ player.name }} ({{ player.number }})</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enregistrement des faits pour l'équipe -->
+  <div class="actions-container">
+    <!-- Paniers marqués -->
+    <div class="scoring-container">
+      <h3>Paniers marqués</h3>
+      <label for="scoring-player">Joueur :</label>
+      <select id="scoring-player" [(ngModel)]="selectedScoringPlayer">
+        <option *ngFor="let player of match?.homePlayers.concat(match?.awayPlayers)" [value]="player">
+          {{ player.name }} ({{ player.number }})
+        </option>
+      </select>
+
+      <label for="points">Points :</label>
+      <select id="points" [(ngModel)]="selectedPoints">
+        <option value="1">1 point</option>
+        <option value="2">2 points</option>
+        <option value="3">3 points</option>
+      </select>
+
+      <button (click)="recordScore()">Enregistrer panier</button>
+    </div>
+
+    <!-- Fautes -->
+    <div class="foul-container">
+      <h3>Enregistrement des fautes</h3>
+      <label for="foul-player">Joueur fautif :</label>
+      <select id="foul-player" [(ngModel)]="selectedFoulPlayer">
+        <option *ngFor="let player of match?.homePlayers.concat(match?.awayPlayers)" [value]="player">
+          {{ player.name }} ({{ player.number }})
+        </option>
+      </select>
+
+      <label for="foul-type">Type de faute :</label>
+      <select id="foul-type" [(ngModel)]="selectedFoulType">
+        <option value="P0">P0</option>
+        <option value="P1">P1</option>
+        <option value="P2">P2</option>
+        <option value="P3">P3</option>
+      </select>
+
+      <button (click)="recordFoul()">Enregistrer faute</button>
+    </div>
+  </div>
+</div>

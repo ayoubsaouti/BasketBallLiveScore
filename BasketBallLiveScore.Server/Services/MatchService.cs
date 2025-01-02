@@ -12,7 +12,7 @@ namespace BasketBallLiveScore.Server.Services
             _context = context;
         }
 
-        public Match CreateMatch(string matchNumber, string competition, DateTime matchDate, int numberOfPeriods, int periodDuration, int overtimeDuration, Team team1, Team team2)
+        public Match CreateMatch(string matchNumber, string competition, DateTime matchDate, int numberOfPeriods, int periodDuration, int overtimeDuration,String encoder, Team team1, Team team2)
         {
             var match = new Match
             {
@@ -22,6 +22,7 @@ namespace BasketBallLiveScore.Server.Services
                 Periods = numberOfPeriods,
                 PeriodDuration = periodDuration,
                 OvertimeDuration = overtimeDuration,
+                Encoder = encoder,
                 Team1 = team1,
                 Team2 = team2
             };

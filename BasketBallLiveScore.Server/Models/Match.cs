@@ -9,6 +9,8 @@
         public int Periods { get; set; }           // Nombre de périodes
         public int PeriodDuration { get; set; }    // Durée de chaque période en minutes
         public int OvertimeDuration { get; set; }  // Durée du prolongation en minutes
+        public string Encoder { get; set; }
+
 
         // Clés étrangères pour les équipes
         public int? Team1Id { get; set; }           // ID de l'équipe à domicile

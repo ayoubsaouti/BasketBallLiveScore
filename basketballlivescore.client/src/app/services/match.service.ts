@@ -30,4 +30,9 @@ export class MatchService {
   addPlayersToMatch(matchId: number, playersData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/addPlayers/${matchId}`, playersData);
   }
+
+  // Méthode pour obtenir un match par ID
+  getMatchById(matchId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/getMatch/${matchId}`);  // Appel à l'API backend
+  }
 }

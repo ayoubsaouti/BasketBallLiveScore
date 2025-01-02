@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BasketBallLiveScore.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241231090458_RemoveQuarter")]
-    partial class RemoveQuarter
+    [Migration("20250101154535_jsonIgnoreRemove")]
+    partial class jsonIgnoreRemove
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

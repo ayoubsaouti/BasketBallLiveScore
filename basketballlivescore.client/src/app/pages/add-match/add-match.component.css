@@ -1,65 +1,161 @@
-/* src/app/pages/add-match/add-match.component.css */
-
-/* Style pour le formulaire d'ajout de match */
-h1 {
-  text-align: center;
-  color: #2C3E50;
-  font-size: 2rem;
-  margin-bottom: 30px;
+/* Style global de la page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
 }
 
-/* Conteneur principal du formulaire */
+/* Style pour le container général */
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 30px;
+}
+
+/* Étapes du formulaire */
 form {
-  max-width: 600px;
-  margin: 0 auto;
+  background-color: #fff;
   padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin: 20px auto;
+  max-width: 600px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Champs de saisie */
 label {
   display: block;
   margin-bottom: 8px;
   font-weight: bold;
-  font-size: 1.1rem;
-  color: #34495e;
 }
 
-input {
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+input[type="checkbox"] {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
+  margin-bottom: 15px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 5px;
   font-size: 1rem;
   box-sizing: border-box;
+  margin-right: 10px; /* Ajoute un peu d'espace à droite */
 }
 
-/* Bouton de soumission */
-button {
-  display: block;
+/* Boutons */
+button[type="submit"], .finalize-button {
   width: 100%;
-  padding: 12px 20px;
+  padding: 12px;
   background-color: #3498db;
   color: white;
   border: none;
   border-radius: 5px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
+  margin-top: 15px;
 }
 
-  button:hover {
+  button[type="submit"]:hover, .finalize-button:hover {
     background-color: #2980b9;
   }
 
-/* Style pour le titre des équipes */
-h3 {
+/* Mise en forme des colonnes pour les joueurs */
+.players-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Colonnes d'équipe */
+.team-column {
+  width: 45%;
+  padding: 15px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  height: 100%;
+}
+
+/* Liste des joueurs de l'équipe */
+.current-team {
   margin-top: 20px;
-  color: #34495e;
-  font-size: 1.5rem;
+}
+
+  .current-team ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .current-team li {
+    margin-bottom: 5px;
+    font-size: 1rem;
+    color: #34495e;
+  }
+
+/* Spacing des éléments du formulaire */
+.player-row {
+  margin-bottom: 10px;
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+/* Boutons d'ajout de joueurs */
+button[type="button"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+  button[type="button"]:hover {
+    background-color: #2980b9;
+  }
+
+/* Style pour les colonnes (à gauche et à droite) */
+.team-column {
+  display: inline-block;
+  width: 48%;
+  vertical-align: top;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Colonne centrale pour finalisation des joueurs */
+.finalize-container {
   text-align: center;
+  margin-top: 20px;
+}
+
+/* Ajustements généraux pour la disposition */
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* S'assurer que les éléments sont bien espacés et alignés */
+.team-column input {
+  width: 100%;
+}
+
+/* Espacement des boutons d'ajout de joueurs */
+button[type="button"]:first-child {
+  margin-right: 10px;
+}
+
+/* Ajustement des titres pour les sections */
+h3 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
 }
