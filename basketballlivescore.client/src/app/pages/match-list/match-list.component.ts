@@ -37,9 +37,9 @@ export class MatchListComponent implements OnInit {
     this.router.navigate(['/add-match']);  // Redirige vers la page d'ajout de match
   }
 
-  encodingFacts(matchId: string): void {
+  encodingFacts(matchId: number): void {
     if (matchId) {
-      this.router.navigate(['/encoding-facts', matchId]);  // Assurez-vous que matchId est valide
+      this.router.navigate([matchId, 'encoding-facts']);  // Format correct pour inclure l'ID dans l'URL
     } else {
       console.error('Match ID is undefined');  // Vérifier si l'ID du match est correct
     }

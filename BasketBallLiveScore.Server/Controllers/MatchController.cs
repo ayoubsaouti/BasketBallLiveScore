@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using BasketBallLiveScore.Server.Data;
 using BasketBallLiveScore.Server.Models;
+using TimeoutModel = BasketBallLiveScore.Server.Models.Timeout;
 using BasketBallLiveScore.Server.DTO;
 using BasketBallLiveScore.Server.Services;
 using System.Threading.Tasks;
@@ -185,7 +186,7 @@ namespace BasketBallLiveScore.Server.Controllers
 
             return Ok(matches);
         }
-
+        
 
         [HttpGet("getMatch/{matchId}")]
         public async Task<ActionResult> GetMatchById(int matchId)
@@ -239,15 +240,68 @@ namespace BasketBallLiveScore.Server.Controllers
             return Ok(matchDTO);  // Retourner les détails du match
         }
 
-        // Endpoint pour enregistrer un panier marqué
-        [HttpPost("{id}/score")]
-        public async Task<ActionResult> RecordScore(int id, [FromBody] ScoreDto scoreDto)
+        [HttpGet("getFacts/{matchId}")]
+        public async Task<ActionResult> GetMatchFacts(int matchId)
         {
-            var match = await _context.Matches.Include(m => m.HomeTeam).Include(m => m.AwayTeam).FirstOrDefaultAsync(m => m.MatchId == id);
+            var match = await _context.Matches
+                .Include(m => m.Team1) // Inclure l'équipe 1
+                .Include(m => m.Team2) // Inclure l'équipe 2
+                .Include(m => m.Scores) // Inclure les scores
+                .Include(m => m.Fouls)  // Inclure les fautes
+                .FirstOrDefaultAsync(m => m.MatchId == matchId);
+
+            if (match == null)
+            {
+                return NotFound("Match non trouvé.");
+            }
+
+            // Créer un objet DTO pour les faits du match (MatchFactsDTO)
+            var matchFactsDTO = new MatchFactsDTO
+            {
+                MatchId = match.MatchId,
+                MatchNumber = match.MatchNumber,
+                Competition = match.Competition,
+                MatchDate = match.MatchDate,
+                Periods = match.Periods,
+                PeriodDuration = match.PeriodDuration,
+                OvertimeDuration = match.OvertimeDuration,
+                HomeTeamName = match.Team1.TeamName,
+                AwayTeamName = match.Team2.TeamName,
+                HomeTeamScore = match.Team1.Score, // Ajouter le score de l'équipe 1
+                AwayTeamScore = match.Team2.Score, // Ajouter le score de l'équipe 2
+                Actions = match.Scores.Select(s =>
+                    $"{s.Player.FirstName} {s.Player.LastName} a marqué {s.Points} points au quart {s.Quarter} à {s.Time.ToString("HH:mm:ss")}")
+                    .Concat(match.Fouls.Select(f =>
+                    $"{f.Player.FirstName} {f.Player.LastName} a commis une faute de type {f.FoulType} au quart {f.Quarter} à {f.Time.ToString("HH:mm:ss")}"))
+                    .ToList()
+            };
+
+            return Ok(matchFactsDTO);  // Retourner les faits du match
+        }
+
+
+
+        // Endpoint pour enregistrer un panier marqué
+        [HttpPost("{idMatch}/score")]
+        public async Task<ActionResult> RecordScore(int idMatch, [FromBody] ScoreDTO scoreDto)
+        {
+            var match = await _context.Matches
+                .Include(m => m.Team1).ThenInclude(t => t.Players)
+                .Include(m => m.Team2).ThenInclude(t => t.Players)
+                .FirstOrDefaultAsync(m => m.MatchId == idMatch);
 
             if (match == null)
             {
                 return NotFound();
+            }
+
+            // Vérifier si le joueur existe dans l'une des équipes
+            var player = match.Team1.Players.Concat(match.Team2.Players)
+                .FirstOrDefault(p => p.PlayerId == scoreDto.PlayerId);
+
+            if (player == null)
+            {
+                return BadRequest("Le joueur n'existe pas dans ce match.");
             }
 
             // Ajouter le score (logique métier)
@@ -255,7 +309,10 @@ namespace BasketBallLiveScore.Server.Controllers
             {
                 PlayerId = scoreDto.PlayerId,
                 Points = scoreDto.Points,
-                Time = DateTime.Now
+                Player = player,
+                Quarter = 1, // Exemple pour le premier quart (vous pouvez ajuster cela en fonction de la logique du match)
+                Time = DateTime.Now, // Enregistrer l'heure actuelle à laquelle le panier a été marqué
+                MatchId = match.MatchId // Associer le score au match
             };
 
             match.Scores.Add(score);
@@ -264,13 +321,16 @@ namespace BasketBallLiveScore.Server.Controllers
             return Ok(new { message = "Panier marqué avec succès" });
         }
 
+
+
         // Endpoint pour enregistrer une faute
         [HttpPost("{id}/foul")]
-        public async Task<ActionResult> RecordFoul(int id, [FromBody] FoulDto foulDto)
+        public async Task<ActionResult> RecordFoul(int id, [FromBody] FoulDTO foulDto)
         {
+            // Récupérer le match par son ID, incluant les informations des équipes
             var match = await _context.Matches
-                .Include(m => m.HomeTeam)
-                .Include(m => m.AwayTeam)
+                .Include(m => m.Team1)
+                .Include(m => m.Team2)
                 .FirstOrDefaultAsync(m => m.MatchId == id);
 
             if (match == null)
@@ -278,20 +338,26 @@ namespace BasketBallLiveScore.Server.Controllers
                 return NotFound();
             }
 
+
+            // Créer la faute avec les informations nécessaires
             var foul = new Foul
             {
                 PlayerId = foulDto.PlayerId,
                 FoulType = foulDto.FoulType,
-                Time = DateTime.Now,
-                Quarter = foulDto.Quarter
+                Time = DateTime.Parse(foulDto.Time), // Convertir le temps (chaîne) en DateTime
+                Quarter = 1 // Associer la faute au quart-temps actuel
             };
 
             match.Fouls.Add(foul);
+
+            // Enregistrer les modifications dans la base de données
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Faute enregistrée avec succès" });
         }
 
+
+        /*
         [HttpPost("{id}/substitution")]
         public async Task<ActionResult> RecordSubstitution(int id, [FromBody] SubstitutionDto substitutionDto)
         {
@@ -332,7 +398,7 @@ namespace BasketBallLiveScore.Server.Controllers
 
 
         [HttpPost("{id}/timeout")]
-        public async Task<ActionResult> RecordTimeout(int id, [FromBody] TimeoutDto timeoutDto)
+        public async Task<ActionResult> RecordTimeout(int id, [FromBody] TimeoutModel timeoutDto)
         {
             var match = await _context.Matches
                 .Include(m => m.HomeTeam)
@@ -344,12 +410,11 @@ namespace BasketBallLiveScore.Server.Controllers
                 return NotFound();
             }
 
-            // Enregistrer le time-out de l'équipe
-            var timeout = new Timeout
+            var timeout = new TimeoutModel
             {
-                Team = timeoutDto.Team,  // 'home' ou 'away'
+                Team = timeoutDto.Team,
                 Quarter = timeoutDto.Quarter,
-                Time = DateTime.Now  // Le moment exact du time-out
+                Time = DateTime.Now  // Utilisez le moment actuel pour enregistrer le time-out
             };
 
             _context.Timeouts.Add(timeout);
@@ -358,6 +423,6 @@ namespace BasketBallLiveScore.Server.Controllers
             return Ok(new { message = "Time-out enregistré avec succès" });
         }
 
-
+        */
     }
 }

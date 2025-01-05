@@ -1,4 +1,6 @@
-﻿namespace BasketBallLiveScore.Server.Models
+﻿using System.Text.Json.Serialization;
+
+namespace BasketBallLiveScore.Server.Models
 {
 
     public class Player
@@ -13,6 +15,8 @@
 
         // Clé étrangère vers l'équipe
         public int TeamId { get; set; }         // ID de l'équipe
+
+        [JsonIgnore]
         public Team Team { get; set; }          // L'équipe du joueur
     }
 

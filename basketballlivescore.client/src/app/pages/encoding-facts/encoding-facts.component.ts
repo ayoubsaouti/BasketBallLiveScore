@@ -8,45 +8,119 @@ import { MatchService } from '../../services/match.service';
   styleUrls: ['./encoding-facts.component.css']
 })
 export class EncodingFactsComponent implements OnInit {
-  match: any;  // Contiendra les données du match récupérées de l'API
+  match: any;
   time: number = 0;
   timerRunning: boolean = false;
   interval: any;
   currentQuarter: number = 1;
 
-  selectedPlayer1: any;
-  selectedPlayer2: any;
-  selectedScoringPlayer: any;
-  selectedPoints: number = 1;
-  selectedFoulPlayer: any;
-  selectedFoulType: string = 'P0';
-  selectedSubInPlayer: any;
-  selectedSubOutPlayer: any;
-  teamWithBall: string | null = null;
+  selectedPlayerTeam1: any;
+  selectedPlayerTeam2: any;
 
-  constructor(
-    private matchService: MatchService,  // Injection du service MatchService
-    private route: ActivatedRoute       // Pour récupérer l'ID du match depuis l'URL
-  ) { }
+
+  selectedPointsTeam1: number = 1;
+  selectedPointsTeam2: number = 1;
+  selectedFoulTypeTeam1: string = 'P0';
+  selectedFoulTypeTeam2: string = 'P0';
+
+  actions: string[] = [];
+  homeTeamScore: number = 0;
+  awayTeamScore: number = 0;
+  matchId: number | null = null;
+
+  constructor(private matchService: MatchService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    const matchId = parseInt(this.route.snapshot.paramMap.get('id') || '', 10);  // Récupérer l'ID du match depuis l'URL
-    if (matchId) {
-      this.loadMatchData(matchId);  // Charger les données du match
+    this.matchId = parseInt(this.route.snapshot.paramMap.get('id') || '', 10);
+    if (this.matchId) {
+      this.loadMatchData(this.matchId);
+    } else {
+      console.error('Aucun match ID trouvé');
     }
   }
 
-  // Charger les données du match
   loadMatchData(matchId: number): void {
     this.matchService.getMatchById(matchId).subscribe(
       (data) => {
-        this.match = data;  // Stocke les données récupérées du match
-        console.log('Match récupéré:', this.match);  // Pour déboguer
+        this.match = data;
+        console.log('Match récupéré:', this.match);
       },
       (error) => {
         console.error('Erreur lors de la récupération des données du match', error);
       }
     );
+  }
+
+  // Ajouter un point (1, 2, ou 3)
+  addPoints(points: number, team: string): void {
+    if (team === 'team1') {
+      this.selectedPointsTeam1 = points;
+    } else if (team === 'team2') {
+      this.selectedPointsTeam2 = points;
+    }
+  }
+
+  // Sélectionner le type de faute
+  selectFoulType(type: string, team: string): void {
+    if (team === 'team1') {
+      this.selectedFoulTypeTeam1 = type;
+    } else if (team === 'team2') {
+      this.selectedFoulTypeTeam2 = type;
+    }
+  }
+
+  // Enregistrer un panier marqué
+  recordScore(team: string): void {
+    let player, points;
+    if (team === 'team1') {
+      player = this.selectedPlayerTeam1;
+      points = this.selectedPointsTeam1;
+      this.homeTeamScore += points; // Mise à jour du score de l'équipe 1
+    } else if (team === 'team2') {
+      player = this.selectedPlayerTeam2;
+      points = this.selectedPointsTeam2;
+      this.awayTeamScore += points; // Mise à jour du score de l'équipe 2
+    }
+
+    if (player && points && this.matchId !== null) {
+      const scoreDto = { playerId: player.playerId, points };
+      this.matchService.recordScore(this.matchId!, scoreDto).subscribe(
+        (response) => {
+          this.actions.push(`${player.firstName} ${player.lastName} a marqué un panier de ${points} points.`);
+          console.log('Panier marqué avec succès', response);
+        },
+        (error) => {
+          console.error('Erreur lors de l\'enregistrement du panier', error);
+        }
+      );
+    }
+  }
+
+  // Enregistrer une faute
+  recordFoul(team: string): void {
+    let player, foulType;
+    if (team === 'team1') {
+      player = this.selectedPlayerTeam1;
+      foulType = this.selectedFoulTypeTeam1;
+    } else if (team === 'team2') {
+      player = this.selectedPlayerTeam2;
+      foulType = this.selectedFoulTypeTeam2;
+    }
+
+    if (player && foulType && this.matchId !== null) {
+      const foulDto = { playerId: player.playerId, foulType, time: '12:41' };
+      this.matchService.recordFoul(this.matchId!, foulDto).subscribe(
+        (response) => {
+          this.actions.push(`${player.firstName} ${player.lastName} a commis une faute de type ${foulType}.`);
+          console.log('Faute enregistrée avec succès', response);
+        },
+        (error) => {
+          console.error('Erreur lors de l\'enregistrement de la faute', error);
+        }
+      );
+    } else {
+      console.error(player);
+    }
   }
 
   // Fonction pour démarrer et arrêter le chrono
@@ -62,28 +136,9 @@ export class EncodingFactsComponent implements OnInit {
     }
   }
 
-  // Fonction pour changer le quart-temps
-  changeQuarter(quarter: number): void {
-    this.currentQuarter = quarter;
-  }
-
-  // Enregistrer un panier marqué
-  recordScore(): void {
-    console.log(`Panier marqué par ${this.selectedScoringPlayer.name}: ${this.selectedPoints} points`);
-  }
-
-  // Enregistrer une faute
-  recordFoul(): void {
-    console.log(`Faute de ${this.selectedFoulPlayer.name} : Type ${this.selectedFoulType}`);
-  }
-
-  // Enregistrer un changement de joueur
-  recordSubstitution(): void {
-    console.log(`Changement de joueurs : ${this.selectedSubOutPlayer.name} sort, ${this.selectedSubInPlayer.name} entre`);
-  }
-
-  // Enregistrer un time-out
-  recordTimeout(): void {
-    console.log('Enregistrement d\'un time-out');
+  formatTime(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   }
 }

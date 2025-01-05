@@ -28,7 +28,7 @@ import { EncodingFactsComponent } from './pages/encoding-facts/encoding-facts.co
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    FormsModule  
+    FormsModule
 
   ],
   providers: [],

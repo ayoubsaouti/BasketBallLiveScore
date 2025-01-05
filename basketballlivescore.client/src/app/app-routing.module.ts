@@ -13,7 +13,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'home', component: MatchListComponent },
   { path: 'add-match', component: AddMatchComponent },
-  { path: 'encoding-facts/:id', component: EncodingFactsComponent },  // Paramètre matchId
+  { path: ':id/encoding-facts', component: EncodingFactsComponent },  // Paramètre matchId
 
 
 ];

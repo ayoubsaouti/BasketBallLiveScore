@@ -8,6 +8,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Ajouter la configuration pour gérer les cycles dans la sérialisation JSON
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;  // Désactive les références circulaires
+    });
+
+
+
 // Ajouter l'authentification avec JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -83,8 +92,8 @@ builder.Services.AddSwaggerGen(c =>
 // Configuration des contrôleurs
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 

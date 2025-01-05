@@ -1,89 +1,37 @@
-/* Style global */
-body {
+.encoding-facts-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
   font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f9f9f9;
 }
 
-h1, h2, h3 {
-  text-align: center;
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
 }
 
-.match-facts-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.chrono-container {
-  text-align: center;
-}
-
-.time-display {
-  font-size: 36px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.start-stop-button {
-  background-color: #007BFF;
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-  .start-stop-button:hover {
-    background-color: #0056b3;
-  }
-
-.teams-container {
+/* Container principal pour les 3 colonnes */
+.main-container {
   display: flex;
   justify-content: space-between;
-  margin-top: 30px;
-  flex-wrap: wrap;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-.team-container {
-  width: 45%;
-  background-color: #333;
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  margin: 10px 0;
-}
-
-.team-info {
-  margin-top: 20px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.actions-container {
-  margin-top: 40px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
-
-.scoring-container,
-.foul-container {
-  width: 48%;
-  background-color: #fff;
+/* Colonne d'action pour marquer un panier et enregistrer une faute */
+.action-column {
+  width: 30%;
   padding: 15px;
-  border-radius: 10px;
+  background-color: #f7f7f7;
+  border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-  .scoring-container h3, .foul-container h3 {
-    margin-bottom: 20px;
-  }
+h3 {
+  font-size: 18px;
+  text-align: center;
+}
 
 label {
   display: block;
@@ -99,42 +47,134 @@ select {
   border: 1px solid #ccc;
 }
 
-button {
-  background-color: #28a745;
+/* Timer - Contrôle du chronomètre */
+.timer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+  .timer-container h3 {
+    font-size: 30px;
+    margin-right: 20px;
+  }
+
+.btn-timer {
+  background-color: #007bff;
   color: white;
-  font-size: 18px;
-  padding: 12px 24px;
-  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
   border-radius: 5px;
+  border: none;
   cursor: pointer;
 }
 
+  .btn-timer:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-timer:active {
+    background-color: #003d7a;
+  }
+
+/* Colonne Résumé du Match au centre */
+.summary-column {
+  width: 35%;
+  padding: 15px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.summary {
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #ccc;
+  font-size: 14px;
+}
+
+/* Affichage des scores des équipes */
+.action-column h4 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* Style pour tous les boutons */
+button {
+  background-color: #007bff; /* Bleu clair */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.3s ease; /* Pour une transition douce */
+}
+
   button:hover {
-    background-color: #218838;
+    background-color: #0056b3; /* Bleu foncé lors du survol */
   }
 
-/* Responsiveness pour les petits écrans */
+  button:active {
+    background-color: #003d7a; /* Bleu plus foncé lorsqu'on clique */
+    transform: scale(0.98); /* Un petit effet de réduction quand on clique */
+  }
+
+  /* Effet pour un bouton déjà cliqué (active state) */
+  button.clicked {
+    background-color: #003d7a; /* Bleu plus foncé */
+  }
+
+  button.btn-green {
+    background-color: #28a745;
+  }
+
+    button.btn-green:hover {
+      background-color: #218838;
+    }
+
+    button.btn-green:active {
+      background-color: #1e7e34; /* Vert foncé lors du clic */
+    }
+
+    button.btn-green.clicked {
+      background-color: #1e7e34; /* Vert foncé */
+    }
+
+/* Boutons pour marquer un panier */
+.points-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.foul-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .teams-container {
+  .main-container {
     flex-direction: column;
+    align-items: center;
   }
 
-  .team-container {
-    width: 100%;
+  .action-column {
+    width: 80%;
     margin-bottom: 20px;
   }
 
-  .actions-container {
-    flex-direction: column;
-  }
-
-  .scoring-container,
-  .foul-container {
-    width: 100%;
+  .summary-column {
+    width: 80%;
     margin-bottom: 20px;
-  }
-
-  .start-stop-button {
-    width: 100%;
   }
 }
