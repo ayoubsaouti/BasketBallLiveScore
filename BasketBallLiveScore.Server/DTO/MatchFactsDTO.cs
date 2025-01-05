@@ -13,7 +13,8 @@
         public string AwayTeamName { get; set; }
         public int HomeTeamScore { get; set; }
         public int AwayTeamScore { get; set; }
-        public List<string> Actions { get; set; } // Résumé des actions du match
+        public List<ScoreDTO> Scores { get; set; }  // Liste des scores
+        public List<FoulDTO> Fouls { get; set; }    // Liste des fautes
     }
 
 }

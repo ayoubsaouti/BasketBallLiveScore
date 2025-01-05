@@ -247,7 +247,9 @@ namespace BasketBallLiveScore.Server.Controllers
                 .Include(m => m.Team1) // Inclure l'équipe 1
                 .Include(m => m.Team2) // Inclure l'équipe 2
                 .Include(m => m.Scores) // Inclure les scores
+                    .ThenInclude(s => s.Player) // Inclure les joueurs associés au score
                 .Include(m => m.Fouls)  // Inclure les fautes
+                    .ThenInclude(f => f.Player) // Inclure les joueurs associés à la faute
                 .FirstOrDefaultAsync(m => m.MatchId == matchId);
 
             if (match == null)
@@ -267,27 +269,38 @@ namespace BasketBallLiveScore.Server.Controllers
                 OvertimeDuration = match.OvertimeDuration,
                 HomeTeamName = match.Team1.TeamName,
                 AwayTeamName = match.Team2.TeamName,
-                HomeTeamScore = match.Team1.Score, // Ajouter le score de l'équipe 1
-                AwayTeamScore = match.Team2.Score, // Ajouter le score de l'équipe 2
-                Actions = match.Scores.Select(s =>
-                    $"{s.Player.FirstName} {s.Player.LastName} a marqué {s.Points} points au quart {s.Quarter} à {s.Time.ToString("HH:mm:ss")}")
-                    .Concat(match.Fouls.Select(f =>
-                    $"{f.Player.FirstName} {f.Player.LastName} a commis une faute de type {f.FoulType} au quart {f.Quarter} à {f.Time.ToString("HH:mm:ss")}"))
-                    .ToList()
+                HomeTeamScore = match.HomeTeamScore,
+                AwayTeamScore = match.AwayTeamScore,
+                Scores = match.Scores.Select(s => new ScoreDTO
+                {
+                    PlayerId = s.PlayerId,
+                    Points = s.Points,
+                    Quarter = s.Quarter,
+                    Time = s.Time,
+                    PlayerName = s.Player != null ? $"{s.Player.FirstName} {s.Player.LastName}" : "Joueur Inconnu" // Vérification si Player est null
+                }).ToList(),
+                Fouls = match.Fouls.Select(f => new FoulDTO
+                {
+                    PlayerId = f.PlayerId,
+                    FoulType = f.FoulType,
+                    Quarter = f.Quarter,
+                    Time = f.Time,
+                    PlayerName = f.Player != null ? $"{f.Player.FirstName} {f.Player.LastName}" : "Joueur Inconnu" // Vérification si Player est null
+                }).ToList()
             };
 
             return Ok(matchFactsDTO);  // Retourner les faits du match
         }
 
-
-
         // Endpoint pour enregistrer un panier marqué
         [HttpPost("{idMatch}/score")]
         public async Task<ActionResult> RecordScore(int idMatch, [FromBody] ScoreDTO scoreDto)
         {
+
             var match = await _context.Matches
                 .Include(m => m.Team1).ThenInclude(t => t.Players)
                 .Include(m => m.Team2).ThenInclude(t => t.Players)
+                .Include(m => m.Scores) // Inclure les scores existants
                 .FirstOrDefaultAsync(m => m.MatchId == idMatch);
 
             if (match == null)
@@ -299,27 +312,41 @@ namespace BasketBallLiveScore.Server.Controllers
             var player = match.Team1.Players.Concat(match.Team2.Players)
                 .FirstOrDefault(p => p.PlayerId == scoreDto.PlayerId);
 
+
             if (player == null)
             {
                 return BadRequest("Le joueur n'existe pas dans ce match.");
             }
 
-            // Ajouter le score (logique métier)
+
+            // Ajouter le score au match
             var score = new Score
             {
                 PlayerId = scoreDto.PlayerId,
                 Points = scoreDto.Points,
                 Player = player,
-                Quarter = 1, // Exemple pour le premier quart (vous pouvez ajuster cela en fonction de la logique du match)
-                Time = DateTime.Now, // Enregistrer l'heure actuelle à laquelle le panier a été marqué
-                MatchId = match.MatchId // Associer le score au match
+                Quarter = 1,  // Exemple pour le premier quart
+                Time = DateTime.Now,  // Enregistrer l'heure actuelle à laquelle le panier a été marqué
+                MatchId = match.MatchId
             };
 
             match.Scores.Add(score);
+
+            // Mise à jour du score de l'équipe
+            if (player.TeamId == match.Team1Id)
+            {
+                match.HomeTeamScore += scoreDto.Points;  // Mise à jour du score de l'équipe 1
+            }
+            else if (player.TeamId == match.Team2Id)
+            {
+                match.AwayTeamScore += scoreDto.Points;  // Mise à jour du score de l'équipe 2
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Panier marqué avec succès" });
         }
+
 
 
 
@@ -344,7 +371,7 @@ namespace BasketBallLiveScore.Server.Controllers
             {
                 PlayerId = foulDto.PlayerId,
                 FoulType = foulDto.FoulType,
-                Time = DateTime.Parse(foulDto.Time), // Convertir le temps (chaîne) en DateTime
+                Time = DateTime.Now, // Convertir le temps (chaîne) en DateTime
                 Quarter = 1 // Associer la faute au quart-temps actuel
             };
 

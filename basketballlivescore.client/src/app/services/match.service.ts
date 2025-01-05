@@ -36,13 +36,18 @@ export class MatchService {
     return this.http.get<any>(`${this.apiUrl}/getMatch/${matchId}`);  // Appel à l'API backend
   }
 
+  // Méthode pour récupérer les faits du match
+  getMatchFacts(matchId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/getFacts/${matchId}`);  // Appel à l'API pour obtenir les faits du match
+  }
+
   // Enregistrer un panier marqué
-  recordScore(matchId: number, scoreDto: { playerId: number, points: number }): Observable<any> {
+  recordScore(matchId: number, scoreDto: { playerId: number, points: number, playerName: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/${matchId}/score`, scoreDto);
   }
 
   // Enregistrer une faute
-  recordFoul(matchId: number, foulDto: { playerId: number, foulType: string, time: string }): Observable<any> {
+  recordFoul(matchId: number, foulDto: { playerId: number, foulType: string, playerName: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/${matchId}/foul`, foulDto);
   }
 }
