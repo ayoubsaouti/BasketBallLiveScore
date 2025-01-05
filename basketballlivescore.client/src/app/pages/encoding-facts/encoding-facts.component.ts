@@ -27,7 +27,7 @@ export class EncodingFactsComponent implements OnInit {
   selectedFoulTypeTeam1: string = 'P0';
   selectedFoulTypeTeam2: string = 'P0';
 
-  actions: string[] = [];
+  actions: any[] = [];
   homeTeamScore: number = 0;
   awayTeamScore: number = 0;
   matchId: number | null = null;
@@ -57,29 +57,34 @@ export class EncodingFactsComponent implements OnInit {
   }
 
   // Charger les faits du match
+  // Charger les faits du match
   loadMatchFacts(matchId: number): void {
     this.matchService.getMatchFacts(matchId).subscribe(
       (data: MatchFacts) => {
         this.actions = [];  // Réinitialisation du tableau des actions
 
-        // Ajouter les scores dans le tableau des actions, en triant par date
+        // Ajouter les scores dans le tableau des actions avec leur date
         data.scores.forEach((score: Score) => {
           const formattedTime = this.formatDate(score.time); // Formater l'heure du score
-          this.actions.push(`${score.playerName} a marqué ${score.points} points au quart ${score.quarter} à ${formattedTime}`);
+          this.actions.push({
+            actionType: 'score', 
+            text: `${score.playerName} a marqué ${score.points} points au quart ${score.quarter} à ${formattedTime}`,
+            date: new Date(score.time), 
+          });
         });
 
-        // Ajouter les fautes dans le tableau des actions, en triant par date
+        // Ajouter les fautes dans le tableau des actions avec leur date
         data.fouls.forEach((foul: Foul) => {
           const formattedTime = this.formatDate(foul.time); // Formater l'heure de la faute
-          this.actions.push(`${foul.playerName} a commis une faute de type ${foul.foulType} au quart ${foul.quarter} à ${formattedTime}`);
+          this.actions.push({
+            actionType: 'foul', // Type de l'action
+            text: `${foul.playerName} a commis une faute de type ${foul.foulType} au quart ${foul.quarter} à ${formattedTime}`,
+            date: new Date(foul.time), // Date de la faute
+          });
         });
 
         // Trier les actions par la date de manière décroissante (du plus récent au plus ancien)
-        this.actions.sort((a, b) => {
-          const dateA = this.extractDate(a);  // Extraction de la date pour chaque action
-          const dateB = this.extractDate(b);
-          return dateB.getTime() - dateA.getTime(); // Tri décroissant
-        });
+        this.actions.sort((a, b) => b.date.getTime() - a.date.getTime());
 
         // Mise à jour des scores des équipes
         this.homeTeamScore = data.homeTeamScore;
@@ -92,6 +97,7 @@ export class EncodingFactsComponent implements OnInit {
       }
     );
   }
+
 
   // Ajouter un point (1, 2, ou 3)
   addPoints(points: number, team: string): void {
@@ -220,7 +226,7 @@ export class EncodingFactsComponent implements OnInit {
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleString('fr-FR', {
-      weekday: 'short', // Jour de la semaine (abrégé)
+      weekday: 'short',  // Jour de la semaine (abrégé)
       year: 'numeric',
       month: 'short',
       day: 'numeric',

@@ -42,14 +42,9 @@
     <div class="summary-column">
       <h3>Résumé du Match</h3>
       <div class="summary">
-        <p *ngFor="let action of actions">{{ action }}</p>
+        <p *ngFor="let action of actions">{{ action.text }}</p>
       </div>
 
-
-      <div class="scores">
-        <p>Score Équipe 1 : {{ homeTeamScore }}</p>
-        <p>Score Équipe 2 : {{ awayTeamScore }}</p>
-      </div>
     </div>
 
     <!-- Colonne de droite - Équipe 2 -->
