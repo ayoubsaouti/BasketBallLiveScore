@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatchService } from '../../services/match.service';
+import { FoulService } from '../../services/foul.service';
+import { ScoreService } from '../../services/score.service';
+import { TimerService } from '../../services/timer.service';
+
 import { MatchFacts } from '../../models/matchFacts.model';
 import { Score } from '../../models/score.model';
 import { Foul } from '../../models/foul.model';
@@ -32,7 +36,7 @@ export class EncodingFactsComponent implements OnInit {
   totalMatchTime: number = 0;
   isMatchFinished: boolean = false;
 
-  constructor(private matchService: MatchService, private route: ActivatedRoute) { }
+  constructor(private matchService: MatchService, private foulService: FoulService, private scoreService: ScoreService, private timerService: TimerService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.matchId = parseInt(this.route.snapshot.paramMap.get('id') || '', 10);
@@ -194,7 +198,7 @@ export class EncodingFactsComponent implements OnInit {
         quarter: this.currentQuarter // Ajouter le quart calculé
       };
 
-      this.matchService.recordScore(this.matchId!, scoreDto).subscribe(
+      this.scoreService.recordScore(this.matchId!, scoreDto).subscribe(
         (response) => {
           console.log('Panier marqué avec succès', response);
 
@@ -238,7 +242,7 @@ export class EncodingFactsComponent implements OnInit {
 
       };
 
-      this.matchService.recordFoul(this.matchId!, foulDto).subscribe(
+      this.foulService.recordFoul(this.matchId!, foulDto).subscribe(
         (response) => {
           this.actions.push({
             actionType: 'foul',
@@ -305,7 +309,7 @@ export class EncodingFactsComponent implements OnInit {
 
   finishMatch(): void {
     // Appeler un service backend pour marquer le match comme terminé
-    this.matchService.finishMatch(this.matchId!).subscribe(
+    this.timerService.finishMatch(this.matchId!).subscribe(
       (response) => {
         console.log("Match terminé", response);
         this.isMatchFinished = true;  // Mettez à jour la variable pour indiquer que le match est terminé
@@ -333,7 +337,7 @@ export class EncodingFactsComponent implements OnInit {
   saveElapsedTimeToDatabase(): void {
     if (this.matchId !== null) {
       const elapsedTimer = this.time;  // Temps écoulé du timer
-      this.matchService.updateElapsedTimer(this.matchId!, elapsedTimer).subscribe(
+      this.timerService.updateElapsedTimer(this.matchId!, elapsedTimer).subscribe(
         (response) => {
           console.log("Temps du timer sauvegardé", response);
         },

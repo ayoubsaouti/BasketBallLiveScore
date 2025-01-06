@@ -60,7 +60,7 @@ export class MatchSummaryComponent implements OnInit, OnDestroy {
     // Abonnez-vous aux mises à jour SignalR en temps réel
     this.signalrService.matchFinishUpdateSource$.subscribe((update) => {
       if (update && update.matchId === this.matchId) {
-          this.isMatchFinished = update.isFinished;
+         this.isMatchFinished = update.isFinished;
       }
     });
 

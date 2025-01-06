@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MatchService {
-  private apiUrl = 'https://localhost:7295/api/match'; // L'URL de votre API
+  private apiUrl = 'https://localhost:7295/api/Match'; // URL de l'API de Match
 
   constructor(private http: HttpClient) { }
 
@@ -31,37 +31,18 @@ export class MatchService {
     return this.http.post<any>(`${this.apiUrl}/addPlayers/${matchId}`, playersData);
   }
 
-  // Méthode pour obtenir un match par ID
+  // Récupérer les détails d'un match par ID
   getMatchById(matchId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/getMatch/${matchId}`);  // Appel à l'API backend
+    return this.http.get<any>(`${this.apiUrl}/getMatch/${matchId}`);
   }
 
-  // Méthode pour récupérer les faits du match
+  // Récupérer les faits d'un match
   getMatchFacts(matchId: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/getFacts/${matchId}`);  // Appel à l'API pour obtenir les faits du match
+    return this.http.get<any>(`${this.apiUrl}/getFacts/${matchId}`);
   }
 
-  // Enregistrer un panier marqué
-  recordScore(matchId: number, scoreDto: { playerId: number, points: number, playerName: string, elapsedTime: number }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${matchId}/score`, scoreDto);
-  }
-
-  // Enregistrer une faute
-  recordFoul(matchId: number, foulDto: { playerId: number, foulType: string, playerName: string, elapsedTime: number }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${matchId}/foul`, foulDto);
-  }
-
-  updateElapsedTimer(matchId: number, elapsedTimer: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/updateElapsedTimer/${matchId}`, elapsedTimer);
-  }
-
-  //  méthode pour marquer un match comme terminé
-  finishMatch(matchId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/finishMatch/${matchId}`, {});
-  }
-
+  // Mettre à jour le quart du match
   updateQuarter(matchId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/updateQuarter/${matchId}`, {});
   }
-
 }

@@ -41,6 +41,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TeamService>();
 builder.Services.AddScoped<MatchService>();
+builder.Services.AddScoped<FoulService>();
+builder.Services.AddScoped<ScoreService>();
+builder.Services.AddScoped<TimerService>();
+
+
 
 // Configuration CORS
 builder.Services.AddCors(options =>
