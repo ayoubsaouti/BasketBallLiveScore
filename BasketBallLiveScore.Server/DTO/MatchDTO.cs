@@ -17,5 +17,15 @@
         public string AwayTeamName { get; set; }
         public List<PlayerDTO> AwayPlayers { get; set; } // Liste des joueurs à l'extérieur
 
+        public int ElapsedTimer { get; set; }  // Temps du timer en secondes
+
+        public Boolean IsFinished { get; set; }
+
+        public int HomeTeamScore { get; set; }  //HomeTeamScore
+        public int AwayTeamScore { get; set; }  // AwayTeamScore
+
+        public int CurrentQuarter { get; set; }
+
+
     }
 }

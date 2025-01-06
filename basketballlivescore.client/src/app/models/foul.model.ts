@@ -4,4 +4,5 @@ export interface Foul {
   quarter: number;
   time: string; // ou Date
   playerName: string;
+  elapsedTime: number;  // Le temps écoulé en secondes
 }

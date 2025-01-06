@@ -5,6 +5,8 @@
   <div class="timer">
     <h3>Timer: {{ formatTime(time) }}</h3>
     <button (click)="startStopTimer()" class="btn-blue">Démarrer/Arrêter</button>
+    <h3>Quarter: {{ currentQuarter }}</h3>
+
   </div>
 
 
@@ -42,8 +44,11 @@
     <div class="summary-column">
       <h3>Résumé du Match</h3>
       <div class="summary">
-        <p *ngFor="let action of actions">{{ action.text }}</p>
+        <p *ngFor="let action of actions">
+          {{ action.text }} 
+        </p>
       </div>
+
 
     </div>
 

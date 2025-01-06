@@ -44,5 +44,13 @@ export class MatchListComponent implements OnInit {
       console.error('Match ID is undefined');  // Vérifier si l'ID du match est correct
     }
   }
+  goToSummary(matchId: number): void {
+    if (matchId) {
+      this.router.navigate([matchId, 'match-summary']);  // Format correct pour inclure l'ID dans l'URL
+    } else {
+      console.error('Match ID is undefined');  // Vérifier si l'ID du match est correct
+    }
+  }
+
 
 }

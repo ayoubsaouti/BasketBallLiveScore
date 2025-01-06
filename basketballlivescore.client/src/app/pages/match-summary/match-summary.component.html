@@ -1,0 +1,34 @@
+<!-- match-summary.component.html -->
+<div class="match-summary">
+  <h2>Résumé du Match</h2>
+
+  <!-- Afficher si le match est terminé -->
+  <div *ngIf="isMatchFinished; else ongoingMatch">
+    <h3>Le match est terminé !</h3>
+  </div>
+
+  <!-- Afficher un message si le match est en cours -->
+  <ng-template #ongoingMatch>
+    <h3>Le match est en cours.</h3>
+  </ng-template>
+
+  <div class="timer">
+    <h3>Timer: {{ formatTime(time) }}</h3>
+    <h3>Quart: {{ currentQuarter }}</h3>
+  </div>
+
+  <div class="scores">
+    <h3>Score Équipe 1: {{ homeTeamScore }}</h3>
+    <h3>Score Équipe 2: {{ awayTeamScore }}</h3>
+  </div>
+
+  <div class="actions">
+    <h3>Actions en Temps Réel</h3>
+    <ul>
+      <li *ngFor="let action of actions">
+        <strong>{{ action.actionType === 'score' ? 'Score' : 'Faute' }}:</strong>
+        {{ action.text }}
+      </li>
+    </ul>
+  </div>
+</div>

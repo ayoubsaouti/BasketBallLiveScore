@@ -9,4 +9,5 @@ export interface Match {
   overtimeDuration: number;
   homeTeam: string;
   awayTeam: string;
+  isMatchFinished: boolean;
 }

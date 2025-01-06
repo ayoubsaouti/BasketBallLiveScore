@@ -1,0 +1,143 @@
+/* Conteneur principal de la page */
+.match-summary {
+  padding: 30px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fafafa; /* Fond léger */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre douce */
+  max-width: 700px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif; /* Police moderne */
+}
+
+/* Sections Timer, Scores, Actions */
+.timer, .scores, .actions {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+  .timer h3, .scores h3 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #2e3d49; /* Couleur de texte subtile */
+  }
+
+/* Section Timer avec fond bleu clair */
+.timer {
+  background-color: #e0f7fa;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* Section Scores avec fond vert clair */
+.scores {
+  background-color: #f1f8e9;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+  .scores h3 {
+    color: #388e3c; /* Vert foncé pour le score */
+  }
+
+/* Section Actions avec fond orange clair */
+.actions {
+  background-color: #fff3e0;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ffcc80; /* Bordure orange clair */
+}
+
+  .actions h3 {
+    font-size: 1.2rem;
+    color: #ff5722; /* Orange vif pour le titre */
+    font-weight: bold;
+  }
+
+  .actions ul {
+    padding-left: 20px;
+  }
+
+  .actions li {
+    padding: 8px 0;
+    font-size: 1rem;
+    color: #3e2723; /* Texte brun foncé */
+    font-weight: 500;
+  }
+
+    .actions li strong {
+      color: #d32f2f; /* Couleur rouge pour le texte important */
+    }
+
+/* Boutons */
+button {
+  font-size: 1rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Bouton "Démarrer/Arrêter" */
+.btn-blue {
+  background-color: #1976d2;
+  color: white;
+}
+
+  .btn-blue:hover {
+    background-color: #1565c0; /* Hover plus sombre */
+  }
+
+/* Bouton "Valider Panier" et "Valider Faute" */
+.btn-green {
+  background-color: #388e3c;
+  color: white;
+}
+
+  .btn-green:hover {
+    background-color: #2c6e2f; /* Hover plus sombre */
+  }
+
+/* Sélection des joueurs et des fautes */
+select, .foul-buttons button {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+
+.foul-buttons button {
+  width: 23%;
+  margin-right: 1%;
+  background-color: #ffd54f; /* Jaune clair */
+  color: #3e2723;
+  border: 1px solid #ffb300;
+}
+
+  .foul-buttons button:hover {
+    background-color: #ffb300;
+    color: white;
+  }
+
+/* Responsivité */
+@media (max-width: 768px) {
+  .match-summary {
+    padding: 15px;
+  }
+
+  .main-container {
+    display: block;
+  }
+
+  .action-column {
+    margin-bottom: 30px;
+  }
+
+  .points-buttons button, .foul-buttons button {
+    width: 48%; /* Deux boutons par ligne sur petits écrans */
+    margin-right: 2%;
+  }
+}

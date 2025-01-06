@@ -42,12 +42,26 @@ export class MatchService {
   }
 
   // Enregistrer un panier marqué
-  recordScore(matchId: number, scoreDto: { playerId: number, points: number, playerName: string }): Observable<any> {
+  recordScore(matchId: number, scoreDto: { playerId: number, points: number, playerName: string, elapsedTime: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/${matchId}/score`, scoreDto);
   }
 
   // Enregistrer une faute
-  recordFoul(matchId: number, foulDto: { playerId: number, foulType: string, playerName: string }): Observable<any> {
+  recordFoul(matchId: number, foulDto: { playerId: number, foulType: string, playerName: string, elapsedTime: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/${matchId}/foul`, foulDto);
   }
+
+  updateElapsedTimer(matchId: number, elapsedTimer: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/updateElapsedTimer/${matchId}`, elapsedTimer);
+  }
+
+  //  méthode pour marquer un match comme terminé
+  finishMatch(matchId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/finishMatch/${matchId}`, {});
+  }
+
+  updateQuarter(matchId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/updateQuarter/${matchId}`, {});
+  }
+
 }

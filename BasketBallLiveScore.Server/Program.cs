@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using BasketBallLiveScore.Server.Hub;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddControllers()
     });
 
 
+builder.Services.AddSignalR();
 
 // Ajouter l'authentification avec JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -43,12 +45,11 @@ builder.Services.AddScoped<MatchService>();
 // Configuration CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+    options.AddPolicy("AllowAngularDevClient",
+        policy => policy.WithOrigins("https://localhost:4200") // L'URL de votre application Angular
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
 });
 
 // Configuration du DbContext avec la chaîne de connexion
@@ -101,6 +102,9 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<MatchHub>("Hub/matchHub");
+
+
 // Configuration du pipeline de requêtes
 if (app.Environment.IsDevelopment())
 {
@@ -109,7 +113,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // Utiliser la politique CORS "AllowAll"
-app.UseCors("AllowAll");
+app.UseCors("AllowAngularDevClient");
 
 app.UseHttpsRedirection();
 

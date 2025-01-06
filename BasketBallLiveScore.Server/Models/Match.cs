@@ -13,6 +13,11 @@
 
         public int HomeTeamScore { get; set; }
         public int AwayTeamScore { get; set; }
+        public int ElapsedTimer { get; set; }  // Temps du timer en secondes
+
+        public Boolean IsFinished { get; set; }
+
+        public int CurrentQuarter { get; set; }
 
         // Clés étrangères pour les équipes
         public int? Team1Id { get; set; }           // ID de l'équipe à domicile
@@ -20,6 +25,8 @@
 
         public int? Team2Id { get; set; }           // ID de l'équipe visiteuse
         public Team? Team2 { get; set; }            // L'équipe visiteuse
+
+
 
         // Relations avec les autres entités
         public ICollection<Score> Scores { get; set; } = new List<Score>(); // Historique des scores

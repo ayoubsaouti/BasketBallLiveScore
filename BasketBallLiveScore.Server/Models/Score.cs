@@ -10,6 +10,8 @@
         public DateTime Time { get; set; } // Heure à laquelle le panier a été marqué
         public int MatchId { get; set; } // Clé étrangère vers le match
         public Match Match { get; set; } // Propriété de navigation vers le match
+        public double ElapsedTime { get; set; } // Durée écoulée sur le timer (en secondes)
+
 
     }
 }

@@ -4,4 +4,5 @@ export interface Score {
   quarter: number;
   time: string; // ou Date si vous gérez le format de la date
   playerName: string;
+  elapsedTime: number;  // Le temps écoulé en secondes
 }

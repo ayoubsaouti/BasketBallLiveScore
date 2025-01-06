@@ -12,6 +12,7 @@ import { AddMatchComponent } from './pages/add-match/add-match.component';  // I
 import { MatchService } from './services/match.service';
 import { FormsModule } from '@angular/forms';
 import { EncodingFactsComponent } from './pages/encoding-facts/encoding-facts.component';
+import { MatchSummaryComponent } from './pages/match-summary/match-summary.component';
 
 
 
@@ -22,7 +23,8 @@ import { EncodingFactsComponent } from './pages/encoding-facts/encoding-facts.co
     RegisterComponent,
     MatchListComponent,
     AddMatchComponent,
-    EncodingFactsComponent
+    EncodingFactsComponent,
+    MatchSummaryComponent
   ],
   imports: [
     BrowserModule,

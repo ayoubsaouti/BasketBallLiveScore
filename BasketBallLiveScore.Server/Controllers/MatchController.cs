@@ -2,14 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using BasketBallLiveScore.Server.Data;
 using BasketBallLiveScore.Server.Models;
-using TimeoutModel = BasketBallLiveScore.Server.Models.Timeout;
 using BasketBallLiveScore.Server.DTO;
 using BasketBallLiveScore.Server.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using BasketBallLiveScore.Server.Hub;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BasketBallLiveScore.Server.Controllers
 {
+
+
     [ApiController]
     [Route("api/[controller]")]
     public class MatchController : ControllerBase
@@ -17,13 +20,18 @@ namespace BasketBallLiveScore.Server.Controllers
         private readonly ApplicationDbContext _context;
         private readonly TeamService _teamService;
         private readonly MatchService _matchService;
+        private readonly IHubContext<MatchHub> _hubContext;
 
-        public MatchController(ApplicationDbContext context, TeamService teamService, MatchService matchService)
+
+        public MatchController(ApplicationDbContext context, TeamService teamService, MatchService matchService, IHubContext<MatchHub> hubContext)
         {
             _context = context;
             _teamService = teamService;
             _matchService = matchService;
+            _hubContext = hubContext;
+
         }
+
 
         // Étape 1: Configurer le match avec les données de base
         [HttpPost("newMatch")]
@@ -215,6 +223,11 @@ namespace BasketBallLiveScore.Server.Controllers
                 OvertimeDuration = match.OvertimeDuration,
                 HomeTeamName = match.Team1.TeamName,
                 AwayTeamName = match.Team2.TeamName,
+                ElapsedTimer = match.ElapsedTimer,
+                IsFinished = match.IsFinished,
+                HomeTeamScore = match.HomeTeamScore,
+                AwayTeamScore = match.AwayTeamScore,
+                CurrentQuarter = match.CurrentQuarter,
                 HomePlayers = match.Team1.Players.Select(p => new PlayerDTO
                 {
                     PlayerId = p.PlayerId,
@@ -277,7 +290,8 @@ namespace BasketBallLiveScore.Server.Controllers
                     Points = s.Points,
                     Quarter = s.Quarter,
                     Time = s.Time,
-                    PlayerName = s.Player != null ? $"{s.Player.FirstName} {s.Player.LastName}" : "Joueur Inconnu" // Vérification si Player est null
+                    PlayerName = s.Player != null ? $"{s.Player.FirstName} {s.Player.LastName}" : "Joueur Inconnu",// Vérification si Player est null
+                    ElapsedTime = s.ElapsedTime
                 }).ToList(),
                 Fouls = match.Fouls.Select(f => new FoulDTO
                 {
@@ -285,22 +299,20 @@ namespace BasketBallLiveScore.Server.Controllers
                     FoulType = f.FoulType,
                     Quarter = f.Quarter,
                     Time = f.Time,
-                    PlayerName = f.Player != null ? $"{f.Player.FirstName} {f.Player.LastName}" : "Joueur Inconnu" // Vérification si Player est null
+                    PlayerName = f.Player != null ? $"{f.Player.FirstName} {f.Player.LastName}" : "Joueur Inconnu", // Vérification si Player est null
+                    ElapsedTime = f.ElapsedTime
                 }).ToList()
             };
 
             return Ok(matchFactsDTO);  // Retourner les faits du match
         }
 
-        // Endpoint pour enregistrer un panier marqué
         [HttpPost("{idMatch}/score")]
         public async Task<ActionResult> RecordScore(int idMatch, [FromBody] ScoreDTO scoreDto)
         {
-
             var match = await _context.Matches
                 .Include(m => m.Team1).ThenInclude(t => t.Players)
                 .Include(m => m.Team2).ThenInclude(t => t.Players)
-                .Include(m => m.Scores) // Inclure les scores existants
                 .FirstOrDefaultAsync(m => m.MatchId == idMatch);
 
             if (match == null)
@@ -312,37 +324,42 @@ namespace BasketBallLiveScore.Server.Controllers
             var player = match.Team1.Players.Concat(match.Team2.Players)
                 .FirstOrDefault(p => p.PlayerId == scoreDto.PlayerId);
 
-
             if (player == null)
             {
                 return BadRequest("Le joueur n'existe pas dans ce match.");
             }
 
-
-            // Ajouter le score au match
+            // Ajouter le score avec l'heure du timer
             var score = new Score
             {
                 PlayerId = scoreDto.PlayerId,
                 Points = scoreDto.Points,
                 Player = player,
-                Quarter = 1,  // Exemple pour le premier quart
-                Time = DateTime.Now,  // Enregistrer l'heure actuelle à laquelle le panier a été marqué
-                MatchId = match.MatchId
+                Quarter = scoreDto.Quarter, 
+                Time = DateTime.Now, // Enregistrer l'heure actuelle
+                ElapsedTime = scoreDto.ElapsedTime, // Utiliser la durée écoulée sur le timer
+                MatchId = match.MatchId // Associer le score au match
             };
 
             match.Scores.Add(score);
 
-            // Mise à jour du score de l'équipe
+            // Incrémenter le score de l'équipe en fonction du joueur
             if (player.TeamId == match.Team1Id)
             {
-                match.HomeTeamScore += scoreDto.Points;  // Mise à jour du score de l'équipe 1
+                match.HomeTeamScore += scoreDto.Points; // Incrémenter le score de l'équipe à domicile
             }
             else if (player.TeamId == match.Team2Id)
             {
-                match.AwayTeamScore += scoreDto.Points;  // Mise à jour du score de l'équipe 2
+                match.AwayTeamScore += scoreDto.Points; // Incrémenter le score de l'équipe visiteuse
             }
-
             await _context.SaveChangesAsync();
+
+            // Appeler SignalR pour notifier tous les clients du nouveau score
+            await _hubContext.Clients.All.SendAsync("ReceiveUpdate", match.MatchId, "score", $"{score.Player.FirstName} {score.Player.LastName} a marqué {score.Points} points au quart {score.Quarter} à ", score.ElapsedTime);
+            
+            // Appeler SignalR pour notifier tous les clients du nouveau score
+            await _hubContext.Clients.All.SendAsync("ReceiveScoreUpdate", match.MatchId, match.HomeTeamScore, match.AwayTeamScore);
+
 
             return Ok(new { message = "Panier marqué avec succès" });
         }
@@ -372,7 +389,9 @@ namespace BasketBallLiveScore.Server.Controllers
                 PlayerId = foulDto.PlayerId,
                 FoulType = foulDto.FoulType,
                 Time = DateTime.Now, // Convertir le temps (chaîne) en DateTime
-                Quarter = 1 // Associer la faute au quart-temps actuel
+                Quarter = foulDto.Quarter, // Associer la faute au quart-temps actuel
+                ElapsedTime = foulDto.ElapsedTime, // Utiliser la durée écoulée sur le timer
+
             };
 
             match.Fouls.Add(foul);
@@ -380,76 +399,88 @@ namespace BasketBallLiveScore.Server.Controllers
             // Enregistrer les modifications dans la base de données
             await _context.SaveChangesAsync();
 
+            await _hubContext.Clients.All.SendAsync("ReceiveUpdate", match.MatchId, "foul", $"{foulDto.PlayerName} a commis une faute de type {foul.FoulType} au quart {foul.Quarter} à ", foul.ElapsedTime);
+
+
             return Ok(new { message = "Faute enregistrée avec succès" });
         }
 
-
-        /*
-        [HttpPost("{id}/substitution")]
-        public async Task<ActionResult> RecordSubstitution(int id, [FromBody] SubstitutionDto substitutionDto)
+        [HttpPost("updateElapsedTimer/{matchId}")]
+        public async Task<ActionResult> UpdateElapsedTimer(int matchId, [FromBody] int elapsedTimer)
         {
-            var match = await _context.Matches
-                .Include(m => m.HomeTeam)
-                .Include(m => m.AwayTeam)
-                .FirstOrDefaultAsync(m => m.MatchId == id);
-
+            var match = await _context.Matches.FirstOrDefaultAsync(m => m.MatchId == matchId);
             if (match == null)
             {
-                return NotFound();
+                return NotFound("Match non trouvé.");
             }
 
-            // Vérifier si les joueurs existent dans le match
-            var subInPlayer = await _context.Players.FindAsync(substitutionDto.SubInPlayerId);
-            var subOutPlayer = await _context.Players.FindAsync(substitutionDto.SubOutPlayerId);
+            // Mettre à jour le temps du timer
+            match.ElapsedTimer = elapsedTimer;
 
-            if (subInPlayer == null || subOutPlayer == null)
-            {
-                return BadRequest("Joueur entrant ou sortant invalide.");
-            }
-
-            // Créer une entrée de substitution
-            var substitution = new Substitution
-            {
-                SubInPlayerId = substitutionDto.SubInPlayerId,
-                SubOutPlayerId = substitutionDto.SubOutPlayerId,
-                Time = DateTime.Now,  // Le moment exact de la substitution
-                Quarter = substitutionDto.Quarter
-            };
-
-            // Ajouter la substitution à l'historique
-            _context.Substitutions.Add(substitution);
+            // Sauvegarder les modifications dans la base de données
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Changement de joueur enregistré avec succès" });
+            // Appeler SignalR pour envoyer la mise à jour du timer à tous les clients connectés
+            await _hubContext.Clients.All.SendAsync("ReceiveTimerUpdate", matchId, elapsedTimer);
+
+            return Ok(new { message = "Temps du match mis à jour avec succès", elapsedTimer });
+        }
+
+        [HttpPost("finishMatch/{matchId}")]
+        public async Task<IActionResult> FinishMatch(int matchId)
+        {
+            var match = await _context.Matches.FirstOrDefaultAsync(m => m.MatchId == matchId);
+            if (match == null)
+            {
+                return NotFound("Match non trouvé.");
+            }
+
+            match.IsFinished = true; // Ajouter un champ "IsFinished" à votre modèle Match pour suivre l'état du match
+
+            await _context.SaveChangesAsync();
+
+            // Appeler SignalR pour notifier tous les clients que le match est terminé
+            await _hubContext.Clients.All.SendAsync("ReceiveMatchFinished", match.MatchId, match.IsFinished);
+
+            return Ok(new { message = "Match marqué comme terminé" });
         }
 
 
-        [HttpPost("{id}/timeout")]
-        public async Task<ActionResult> RecordTimeout(int id, [FromBody] TimeoutModel timeoutDto)
+        [HttpPost("updateQuarter/{matchId}")]
+        public async Task<IActionResult> UpdateQuarter(int matchId)
         {
             var match = await _context.Matches
-                .Include(m => m.HomeTeam)
-                .Include(m => m.AwayTeam)
-                .FirstOrDefaultAsync(m => m.MatchId == id);
+                .Include(m => m.Scores) // Inclure les scores du match
+                .FirstOrDefaultAsync(m => m.MatchId == matchId);
 
             if (match == null)
             {
-                return NotFound();
+                return NotFound("Match non trouvé.");
             }
 
-            var timeout = new TimeoutModel
+            // Vérifier si le match est terminé
+            if (match.Periods == match.CurrentQuarter)
             {
-                Team = timeoutDto.Team,
-                Quarter = timeoutDto.Quarter,
-                Time = DateTime.Now  // Utilisez le moment actuel pour enregistrer le time-out
-            };
+                // Si les quarts sont terminés, marquer le match comme terminé
+                match.IsFinished = true;
+                await _context.SaveChangesAsync();
 
-            _context.Timeouts.Add(timeout);
+                return Ok(new { message = "Le match est terminé.", isFinished = true });
+            }
+
+            // Passer au quart suivant
+            match.CurrentQuarter += 1;
+
+            // Sauvegarder les modifications dans la base de données
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Time-out enregistré avec succès" });
+            // Mettre à jour le quart actuel via SignalR
+            await _hubContext.Clients.All.SendAsync("ReceiveQuarterUpdate", match.MatchId, match.CurrentQuarter);
+
+
+            return Ok(new { message = $"Passage au quart {match.CurrentQuarter}", currentQuarter = match.CurrentQuarter });
         }
 
-        */
+        
     }
 }
