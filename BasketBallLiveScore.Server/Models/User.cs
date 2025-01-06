@@ -5,5 +5,7 @@
         public int UserId { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; } // Mot de passe haché
+        public string Role { get; set; }  // "Admin" ou "User"
+
     }
 }

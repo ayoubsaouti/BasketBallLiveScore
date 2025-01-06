@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatchService } from '../../services/match.service';
+import { AuthService } from '../../services/auth.service'; 
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,7 +12,7 @@ export class MatchListComponent implements OnInit {
   matches: any[] = [];
   loading: boolean = true;
 
-  constructor(private matchService: MatchService, private router: Router) { }
+  constructor(private matchService: MatchService, private router: Router, public authService: AuthService) { }
 
   ngOnInit(): void {
     this.loadMatches();

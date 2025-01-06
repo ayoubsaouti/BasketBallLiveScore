@@ -1,6 +1,5 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';  // Importer HttpHeaders ici
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -44,5 +43,55 @@ export class AuthService {
         throw error;
       })
     );
+  }
+
+  // Stocker le token dans le localStorage
+  saveToken(token: string): void {
+    localStorage.setItem('token', token);
+  }
+
+  // Récupérer le token du localStorage
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  // Supprimer le token du localStorage (déconnexion)
+  removeToken(): void {
+    localStorage.removeItem('token');
+  }
+
+  // Décoder le token JWT et récupérer les informations du rôle
+  getRole(): string {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = this.decodeToken(token);
+      return decodedToken.role;
+    }
+    return '';
+  }
+
+  // Décoder le token JWT
+  decodeToken(token: string) {
+    const payload = token.split('.')[1];
+    const decoded = atob(payload);
+    return JSON.parse(decoded);
+  }
+
+  // Vérifier si l'utilisateur a un rôle spécifique
+  hasRole(role: string): boolean {
+    console.log(role);
+    return this.getRole() === role;
+  }
+
+  // Vérifier si l'utilisateur est connecté
+  isLoggedIn(): boolean {
+    const token = this.getToken();
+    return token !== null; // Si un token est présent, l'utilisateur est connecté
+  }
+
+  // Méthode pour obtenir les headers avec Authorization Bearer
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 }

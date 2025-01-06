@@ -37,14 +37,14 @@
     <!-- Bouton pour l'encodage en temps réel des faits de match -->
     <div class="real-time-encoding-container">
       <button class="real-time-encoding-button" (click)="goToSummary(match.matchId)">
-        Affichage client
+        Visualiser le match
       </button>
-      <button class="real-time-encoding-button" (click)="encodingFacts(match.matchId)">
+      <button *ngIf="authService.hasRole('Admin')" class="real-time-encoding-button" (click)="encodingFacts(match.matchId)">
         Encodage des faits de match
       </button>
     </div>
   </div>
 
   <!-- Bouton d'ajout de match -->
-  <button class="add-match-button" (click)="addNewMatch()">Ajouter un match</button>
+  <button *ngIf="authService.hasRole('Admin')" class="add-match-button" (click)="addNewMatch()">Ajouter un match</button>
 </div>

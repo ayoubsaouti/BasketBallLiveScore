@@ -3,6 +3,7 @@
     using Microsoft.AspNetCore.Mvc;
     using BasketBallLiveScore.Server.Services;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Authorization;
 
     [ApiController]
     [Route("api/[controller]")]
@@ -16,6 +17,7 @@
         }
 
         // Endpoint pour mettre à jour le timer
+        [Authorize(Roles = "Admin")]
         [HttpPost("updateElapsedTimer/{matchId}")]
         public async Task<ActionResult> UpdateElapsedTimer(int matchId, [FromBody] int elapsedTimer)
         {
@@ -26,6 +28,7 @@
         }
 
         // Endpoint pour terminer le match
+        [Authorize(Roles = "Admin")]
         [HttpPost("finishMatch/{matchId}")]
         public async Task<IActionResult> FinishMatch(int matchId)
         {

@@ -28,7 +28,8 @@ namespace BasketBallLiveScore.Server.Services
             // Créer un nouvel utilisateur
             var user = new User
             {
-                Email = request.Email
+                Email = request.Email,
+                Role = "User" // Par défaut, attribuer "User" comme rôle
             };
 
             // Hachage du mot de passe avec PasswordHasher, qui gère le salt automatiquement
@@ -62,14 +63,27 @@ namespace BasketBallLiveScore.Server.Services
             // Créer un token JWT
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:SecretKey"]);
+
+            // Créer un claim supplémentaire (par exemple, Permission) si nécessaire
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserId.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role), // Ajouter le rôle dans les claims
+            };
+
+            // Si c'est un admin, ajouter un claim supplémentaire
+            if (user.Role == "Admin")
+            {
+                claims.Add(new Claim("Permission", "FullAccess"));
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserId.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email)
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(7),
+                Audience = _configuration["Jwt:Audience"], // Utilisez la configuration pour l'audience
+                Issuer = _configuration["Jwt:Issuer"],   // Utilisez la configuration pour l'émetteur
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

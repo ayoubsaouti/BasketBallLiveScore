@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BasketBallLiveScore.Server.DTO;
 using BasketBallLiveScore.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BasketBallLiveScore.Server.Controllers
 {
@@ -16,6 +17,7 @@ namespace BasketBallLiveScore.Server.Controllers
         }
 
         // Endpoint pour enregistrer une faute
+        [Authorize(Roles = "Admin")]
         [HttpPost("{id}/foul")]
         public async Task<ActionResult> RecordFoul(int id, [FromBody] FoulDTO foulDto)
         {

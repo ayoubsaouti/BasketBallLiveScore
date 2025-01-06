@@ -4,6 +4,7 @@
     using BasketBallLiveScore.Server.Services;
     using BasketBallLiveScore.Server.DTO;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Authorization;
 
     [ApiController]
     [Route("api/[controller]")]
@@ -17,6 +18,7 @@
         }
 
         // Endpoint pour enregistrer un score
+        [Authorize(Roles = "Admin")]
         [HttpPost("{idMatch}/score")]
         public async Task<ActionResult> RecordScore(int idMatch, [FromBody] ScoreDTO scoreDto)
         {

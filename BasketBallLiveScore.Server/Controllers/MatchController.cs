@@ -4,11 +4,11 @@ using BasketBallLiveScore.Server.Data;
 using BasketBallLiveScore.Server.Models;
 using BasketBallLiveScore.Server.DTO;
 using BasketBallLiveScore.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BasketBallLiveScore.Server.Controllers
 {
-
-
+    
     [ApiController]
     [Route("api/[controller]")]
     public class MatchController : ControllerBase
@@ -28,6 +28,7 @@ namespace BasketBallLiveScore.Server.Controllers
 
 
         // Étape 1: Configurer le match avec les données de base
+        [Authorize(Roles = "Admin")]
         [HttpPost("newMatch")]
         public async Task<ActionResult> ConfigureMatch([FromBody] ConfigMatchDTO config)
         {
@@ -55,6 +56,7 @@ namespace BasketBallLiveScore.Server.Controllers
         }
 
         // Étape 2: Ajouter les équipes au match sans ajouter les joueurs
+        [Authorize(Roles = "Admin")]
         [HttpPost("addTeams/{matchId}")]
         public async Task<ActionResult> AddTeamsToMatch(int matchId, [FromBody] TeamDetailsDTO teams)
         {
@@ -88,6 +90,7 @@ namespace BasketBallLiveScore.Server.Controllers
 
 
         // Ajouter les joueurs aux équipes du match
+        [Authorize(Roles = "Admin")]
         [HttpPost("addPlayers/{matchId}")]
         public async Task<ActionResult> AddPlayersToMatch(int matchId, [FromBody] PlayerDetailsDTO playerDetails)
         {
@@ -101,6 +104,7 @@ namespace BasketBallLiveScore.Server.Controllers
             return NotFound("Match non trouvé.");
         }
 
+        [Authorize(Roles = "Admin,User")]
         [HttpGet("getMatches")]
         public async Task<ActionResult> GetMatches()
         {
@@ -116,6 +120,7 @@ namespace BasketBallLiveScore.Server.Controllers
         }
 
         //ENDPOINT pour récuperer toutes les infos d'un match (regle)
+        [Authorize(Roles = "Admin,User")]
         [HttpGet("getMatch/{matchId}")]
         public async Task<ActionResult> GetMatchById(int matchId)
         {
@@ -130,6 +135,7 @@ namespace BasketBallLiveScore.Server.Controllers
         }
 
         //ENDPOINT pour récuperer les faits d'un match
+        [Authorize(Roles = "Admin,User")]
         [HttpGet("getFacts/{matchId}")]
         public async Task<ActionResult> GetMatchFacts(int matchId)
         {
@@ -144,6 +150,7 @@ namespace BasketBallLiveScore.Server.Controllers
         }
 
         //ENDPOINT pour update le quarter actuelle
+        [Authorize(Roles = "Admin")]
         [HttpPost("updateQuarter/{matchId}")]
         public async Task<IActionResult> UpdateQuarter(int matchId)
         {

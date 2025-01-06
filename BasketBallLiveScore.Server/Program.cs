@@ -16,36 +16,62 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;  // Désactive les références circulaires
     });
 
-
+// Ajouter SignalR
 builder.Services.AddSignalR();
 
-// Ajouter l'authentification avec JWT
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// Ajouter Swagger et la configuration JWT pour Swagger
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        options.RequireHttpsMetadata = false;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-        };
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Description = "Bearer Authentication with JWT Token",
+        Type = SecuritySchemeType.Http
     });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Id = "Bearer",
+                        Type = ReferenceType.SecurityScheme
+                    }
+                },
+                new List<string>()
+            }
+        });
+});
 
-// Services
+// Configuration JWT Bearer
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateActor = true, // identifier les parties
+                ValidateAudience = true, // empecher les attaques par rejeu => un site ne peut pas rejouer un token sur un autre site
+                ValidateLifetime = true, // limiter la durée de vie di token
+                ValidateIssuerSigningKey = true, // demande l'utilisation de signature
+                ValidIssuer = builder.Configuration["Jwt:Issuer"], // emetteur du token
+                ValidAudience = builder.Configuration["Jwt:Audience"], // receveur du token
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+                ClockSkew = TimeSpan.Zero // par défaut c'est 5 minutes. Il s'agit de l'écart de temps autorisé entre l'heure du client et celle du serveur
+
+            };
+        });
+
+// Ajouter les services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TeamService>();
 builder.Services.AddScoped<MatchService>();
 builder.Services.AddScoped<FoulService>();
 builder.Services.AddScoped<ScoreService>();
 builder.Services.AddScoped<TimerService>();
-
-
 
 // Configuration CORS
 builder.Services.AddCors(options =>
@@ -61,45 +87,20 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// Ajouter Swagger et la configuration JWT pour Swagger
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Basketball Live Score API",
-        Version = "v1"
-    });
 
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Veuillez entrer le token JWT",
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT",
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
 
 // Configuration des contrôleurs
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddAuthorization();
-builder.Services.AddSwaggerGen();
+
+// Configure authorization policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+    options.AddPolicy("AdminOrUser", policy => policy.RequireRole("Admin","User")); // Permet l'accès aux deux rôles
+});
+
 
 var app = builder.Build();
 
@@ -109,7 +110,6 @@ app.UseAuthorization();
 
 app.MapHub<MatchHub>("Hub/matchHub");
 
-
 // Configuration du pipeline de requêtes
 if (app.Environment.IsDevelopment())
 {
@@ -117,7 +117,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Utiliser la politique CORS "AllowAll"
+// Utiliser la politique CORS "AllowAngularDevClient"
 app.UseCors("AllowAngularDevClient");
 
 app.UseHttpsRedirection();
