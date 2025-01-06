@@ -99,6 +99,7 @@ namespace BasketBallLiveScore.Server.Services
         public async Task<List<MatchDTO>> GetAllMatchesAsync()
         {
             var matches = await _context.Matches
+                .Where(m => !m.IsFinished)  // Filtrer les matchs où IsFinished est false (matchs non terminés)
                 .Include(m => m.Team1)
                 .ThenInclude(t => t.Players)
                 .Include(m => m.Team2)
@@ -112,6 +113,7 @@ namespace BasketBallLiveScore.Server.Services
                     Periods = m.Periods,
                     PeriodDuration = m.PeriodDuration,
                     OvertimeDuration = m.OvertimeDuration,
+                    Encoder = m.Encoder,
                     HomeTeamName = m.Team1.TeamName,
                     AwayTeamName = m.Team2.TeamName,
                     HomePlayers = m.Team1.Players.Select(p => new PlayerDTO

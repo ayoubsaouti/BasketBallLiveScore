@@ -21,7 +21,7 @@ export class MatchListComponent implements OnInit {
   loadMatches(): void {
     this.matchService.getMatches().subscribe(
       (data) => {
-        console.log(data); // Affiche les données pour vérifier leur structure
+        console.log("AAA : ",data); // Affiche les données pour vérifier leur structure
         this.matches = data;
         this.loading = false;
       },

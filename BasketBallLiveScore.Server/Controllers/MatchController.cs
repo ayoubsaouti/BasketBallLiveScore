@@ -5,6 +5,7 @@ using BasketBallLiveScore.Server.Models;
 using BasketBallLiveScore.Server.DTO;
 using BasketBallLiveScore.Server.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BasketBallLiveScore.Server.Controllers
 {
@@ -37,7 +38,10 @@ namespace BasketBallLiveScore.Server.Controllers
                 return BadRequest("Les données du match sont invalides.");
             }
 
-            
+            // Récupérer l'email de l'utilisateur connecté depuis les claims
+            var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+
 
             // Créer le match avec les informations de base (sans les équipes)
             var match = _matchService.CreateMatch(
@@ -47,7 +51,7 @@ namespace BasketBallLiveScore.Server.Controllers
                 config.Periods,
                 config.PeriodDuration,
                 config.OvertimeDuration,
-                "Test", // Enregistre l'email de l'utilisateur qui crée le match
+                userEmail, // Enregistre l'email de l'utilisateur qui crée le match
                 null, // Pas d'équipes associées pour l'instant
                 null  // Pas d'équipes associées pour l'instant
             );

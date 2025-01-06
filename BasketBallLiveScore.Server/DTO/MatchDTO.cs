@@ -10,7 +10,7 @@
         public int Periods { get; set; }  // Nombre de périodes
         public int PeriodDuration { get; set; }  // Durée de chaque période (en minutes)
         public int OvertimeDuration { get; set; }  // Durée du prolongement (en minutes)
-
+        public string Encoder { get; set; }
         public string HomeTeamName { get; set; }
         public List<PlayerDTO> HomePlayers { get; set; } // Liste des joueurs à domicile
 
@@ -23,6 +23,7 @@
 
         public int HomeTeamScore { get; set; }  //HomeTeamScore
         public int AwayTeamScore { get; set; }  // AwayTeamScore
+
 
         public int CurrentQuarter { get; set; }
 
